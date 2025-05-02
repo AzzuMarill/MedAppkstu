@@ -776,6 +776,17 @@ app.put('/api/doctors/:id', async (req, res) => {
   );
 });
 
+const fs = require('fs');
+
+app.get('/', (req, res) => {
+  const filePath = path.join(__dirname, 'login.html');
+  fs.readFile(filePath, (err, data) => {
+    if (err) return res.status(500).send('Ошибка при загрузке страницы');
+    res.setHeader('Content-Type', 'text/html');
+    res.send(data);
+  });
+});
+
 // Запуск сервера
 const PORT = 3000;
 app.listen(PORT, () => {
