@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Анкета студента</title>
+  <link rel="stylesheet" href="univer-style.css" />
+</head>
+<body>
+  <div class="page-wrapper">
+  <header class="header">
+    <div class="header-top">
+      <img src="img/logo.png" alt="Logo" class="header-logo">
+      <div class="header-title">Students medical app — Анкета студента</div>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <aside class="left-sidebar">
+    </aside>
+
+    <section class="center-content">
+      <h2>Анкета студента</h2>
+      <p style="margin-bottom: 1rem;">Пожалуйста, заполните анкету ниже</p>
+
+      <form class="big-form">
+        <!-- Личные данные -->
+        <h3 style="margin-bottom: 1rem;">Личные данные</h3>
+        <div class="form-group">
+          <label for="fullName">ФИО</label>
+          <input type="text" id="fullName" name="fullName" placeholder="Аманов Аман Аманулы" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="example@mail.ru" required />
+        </div>
+        <div class="form-group">
+          <label for="phone">Телефон</label>
+          <input type="tel" id="phone" name="phone" placeholder="+7 777 777 77 77" />
+        </div>
+        <div class="form-group">
+          <label for="dob">Дата рождения</label>
+          <input type="date" id="dob" name="dob" />
+        </div>
+        <div style="display: flex; gap: 1.5rem; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center;">
+            <span>Пол</span>
+          </div>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <label style="display: flex; align-items: center; gap: 0.3rem;">
+              <input type="radio" name="gender" value="male" checked />
+              Мужской
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.3rem;">
+              <input type="radio" name="gender" value="female" />
+              Женский
+            </label>
+          </div>
+        </div>     
+        <div class="form-group">
+        <label for="faculty">Факультет</label>
+        <input type="text" id="faculty" name="faculty" placeholder="ФИТ">
+        </div>
+        <div class="form-group">
+          <label for="occupation">Группа</label>
+          <input type="text" id="occupation" name="occupation" placeholder="СИБ-хх-х" />
+        </div>
+        
+        <div class="form-group">
+          <label for="address">Адрес проживания</label>
+          <input type="text" id="address" name="address" placeholder="г. Караганда, ул. Абая 123, кв. 45" />
+        </div>
+        <div class="form-group-row">
+          <div class="form-group">
+            <label for="emergencyContact">Контакт для экстренных случаев</label>
+            <input type="text" id="emergencyContact" name="emergencyContact" placeholder="Родители/законный представитель" />
+          </div>
+          <div class="form-group">
+            <label for="emergencyNumber">Номер экстренного контакта</label>
+            <input type="tel" id="emergencyNumber" name="emergencyNumber" placeholder="+7 777 777 77 77" />
+          </div>
+        </div>
+
+        <!-- Медицинские данные -->
+        <h3 style="margin-bottom: 1rem;"3>Медицинские данные</h3>
+        <div class="form-group">
+          <label for="primaryPhysician">Медицинская организация по прикреплению</label>
+          <input type="text" id="primaryPhysician" name="primaryPhysician" placeholder="НАО МУК" />
+        </div>
+        <div class="form-group">
+          <label for="treatingDoctor">Лечащий врач</label>
+          <input type="text" id="treatingDoctor" name="treatingDoctor" placeholder="ФИО врача" />
+        </div>
+        <div class="form-group">
+          <label for="allergies">Аллергии</label>
+          <input type="text" id="allergies" name="allergies" placeholder="Арахис, лекарства и т.д." />
+        </div>
+        <div class="form-group">
+          <label for="currentMedication">Принимаемые препараты</label>
+          <input type="text" id="currentMedication" name="currentMedication" placeholder="Например, Ibuprofen" />
+        </div>
+        <div class="form-group">
+          <label for="familyHistory">Семейная история болезней</label>
+          <input type="text" id="familyHistory" name="familyHistory" placeholder="Гипертония, болезни сердца..." />
+        </div>
+        <div class="form-group">
+          <label for="pastHistory">Прошлая медицинская история</label>
+          <input type="text" id="pastHistory" name="pastHistory" placeholder="Например, удаление аппендикса" />
+        </div>
+
+        <!-- Согласие -->
+        <div
+        style="
+          display: inline-flex; 
+          align-items: center; 
+          gap: 1rem; 
+          margin-bottom: 1rem; 
+          white-space: nowrap;"
+        >
+        
+        <label style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0;">
+          <input type="checkbox" required />
+          <span>Я согласен(-на) на обработку моих персональных данных</span>
+        </label>
+        </div>
+
+        <button type="submit" class="btn-submit">Сохранить</button>
+        </form>
+    </section>
+  </div>
+
+  <footer class="footer">
+    © 2025 Students medical app (SMA)
+  </footer>
+</div>
+  <script src="long-form.js"></script>
+</body>
+</html>

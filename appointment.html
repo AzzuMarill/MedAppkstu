@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Запись на прием</title>
+  <link rel="stylesheet" href="univer-style.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-top">
+      <img src="img/logo.png" alt="Logo" class="header-logo">
+      <div class="header-title">Students medical app — Запись на прием</div>
+    </div>
+    <nav class="header-menu">
+      <ul>
+        <li><a href="login.html">Выйти</a></li>
+        <li><a href="admin.html">Админ</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="main-content">
+    <aside class="left-sidebar">
+      <h3>Меню</h3>
+      <ul>
+        <li><a href="appointment.html">Новая запись</a></li>
+        <li><a href="long-form.html">Анкета</a></li>
+      </ul>
+    </aside>
+
+    <section class="center-content">
+      <h2>Новая запись</h2>
+      <form class="appointment-form">
+        <div class="form-group">
+          <label for="doctor">Врач</label>
+          <select id="doctor" name="doctor" required>
+            <option value="" disabled selected>Выберите врача</option>
+            <option value="doctor1">Дәрігер А</option>
+            <option value="doctor2">Дәрігер Б</option>
+            <option value="doctor3">Дәрігер С</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="appointmentDateTime">Дата и время</label>
+          <input 
+            type="datetime-local" 
+            id="appointmentDateTime" 
+            name="appointmentDateTime" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="reason">Причина обращения</label>
+          <input 
+            type="text" 
+            id="reason" 
+            name="reason" 
+            placeholder="Регулярный осмотр, головная боль, etc." 
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Примечания</label>
+          <textarea 
+            id="notes" 
+            name="notes" 
+            rows="3"
+            placeholder="Введите примечания..."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="inPerson" name="inPerson" checked />
+            Личный прием
+          </label>
+        </div>
+
+        <button type="submit" class="btn-submit">Записаться</button>
+      </form>
+    </section>
+  </div>
+
+  <footer class="footer">
+    © 2025 Students medical app
+  </footer>
+
+</body>
+</html>

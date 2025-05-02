@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Students medical app — Вход</title>
+  <link rel="stylesheet" href="univer-style.css" />
+  <style>
+    .message-block {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 6px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .message-error {
+      background-color: #ffe0e0;
+      color: #a00;
+      border: 1px solid #ff4f5a;
+    }
+
+    .message-success {
+      background-color: #e0ffe0;
+      color: #067d06;
+      border: 1px solid #4caf50;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- ШАПКА -->
+    <header class="header">
+      <div class="header-top">
+        <img src="img/logo.png" alt="Logo" class="header-logo">
+        <div class="header-title">Students medical app</div>
+      </div>
+    </header>
+
+    <!-- ОСНОВНАЯ ЧАСТЬ -->
+    <div class="main-content">
+      <!-- ЛЕВАЯ КОЛОНКА -->
+      <aside class="left-sidebar">
+        <h3>Меню</h3>
+        <ul>
+          <li><a href="admin-login.html">Админ</a></li>
+          <li><a href="https://www.kstu.kz/" target="_blank">Оф.сайт университета</a></li>
+          <li><a href="https://egov.kz/cms/kk" target="_blank">egov</a></li>
+        </ul>
+      </aside>
+
+      <!-- ЦЕНТРАЛЬНАЯ ЧАСТЬ -->
+      <section class="center-content">
+        <h2>Авторизация</h2>
+        <p>При возникновении проблем, просим связаться с вашим куратором.</p>
+
+        <form class="login-form" id="loginForm">
+          <div class="form-group">
+            <label for="login">Логин</label>
+            <input type="text" id="login" name="login" placeholder="Логин" />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" placeholder="Пароль" />
+          </div>
+
+          <button type="submit" class="btn-submit">Войти</button>
+        </form>
+
+        <div id="loginMessage" class="message-block"></div>
+      </section>
+    </div>
+
+    <!-- ПОДВАЛ -->
+    <footer class="footer">
+      © 2025 Students medical app (SMD)
+    </footer>
+  </div>
+
+  <script src="login.js"></script>
+
+</body>
+</html>

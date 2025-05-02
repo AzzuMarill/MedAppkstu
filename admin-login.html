@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Вход администратора — Students medical app</title>
+  <link rel="stylesheet" href="univer-style.css" />
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Шапка -->
+    <header class="header">
+      <div class="header-top">
+        <img src="img/logo.png" alt="Logo" class="header-logo">
+        <div class="header-title">Students medical app</div>
+      </div>
+    </header>
+
+    <!-- Основной контент -->
+    <div class="main-content">
+      <!-- Левая колонка -->
+      <aside class="left-sidebar">
+        <h3>Меню</h3>
+        <ul>
+          <li><a href="login.html">Назад ко входу</a></li>
+          <li><a href="https://www.kstu.kz/" target="_blank">Оф.сайт университета</a></li>
+          <li><a href="https://egov.kz/cms/kk" target="_blank">egov</a></li>
+        </ul>
+      </aside>
+
+      <!-- Центральная часть -->
+      <section class="center-content">
+        <h2>Вход администратора</h2>
+        <p>Пожалуйста, введите ваши учетные данные для входа.</p>
+
+        <form id="adminLoginForm" class="login-form">
+          <div class="form-group">
+            <label for="adminLogin">Логин</label>
+            <input type="text" id="adminLogin" name="adminLogin" placeholder="Логин" required>
+          </div>
+
+          <div class="form-group">
+            <label for="adminPassword">Пароль</label>
+            <input type="password" id="adminPassword" name="adminPassword" placeholder="Пароль" required>
+          </div>
+
+          <button type="submit" class="btn-submit">Войти</button>
+          <div id="adminLoginMessage" style="margin-top: 1rem; color: red;"></div>
+        </form>
+      </section>
+    </div>
+
+    <!-- Подвал -->
+    <footer class="footer">
+      © 2025 Students medical app (SMD)
+    </footer>
+  </div>
+
+  <script src="admin-login.js"></script>
+  <!-- Модальное окно для ввода кода -->
+  <div id="codeModal" class="modal" style="display:none;">
+    <div class="modal-content" style="width: 400px; max-width: 90%;">
+      <h3 style="margin-bottom: 1rem;">Введите код подтверждения из Telegram</h3>
+      <input type="text" id="telegramCodeInput" placeholder="Код" class="form-control" />
+      <div style="margin-top: 1rem; display: flex; justify-content: space-between;">
+        <button id="verifyCodeBtn" class="btn-submit">Подтвердить</button>
+        <button id="cancelCodeBtn" class="btn-cancel">Отмена</button>
+      </div>
+      <p id="codeError" style="color: red; margin-top: 10px;"></p>
+    </div>
+  </div>
+
+</body>
+</html>

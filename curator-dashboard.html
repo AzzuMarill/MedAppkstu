@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Кабинет куратора</title>
+  <link rel="stylesheet" href="univer-style.css" />
+  <div id="accessDeniedMessage" style="display:none; padding: 10px; background: #ffcccc; color: #a00; font-weight: bold; text-align: center;">
+    Доступ только для кураторов. Перенаправление на страницу входа...
+  </div>
+  
+  <script>
+    const role = localStorage.getItem('role');
+    const id = localStorage.getItem('userId');
+    const allowedRole = 'curator';
+    const messageBlock = document.getElementById('accessDeniedMessage');
+  
+    if (!id || role !== allowedRole) {
+      messageBlock.style.display = 'block';
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 3000);
+    }
+  </script>
+  
+</head>
+<body>
+  <div class="page-wrapper">
+    <header class="header">
+        <div class="header-top improved-header">
+          <div class="header-brand">
+            <img src="img/logo.png" alt="Logo" class="header-logo" />
+            <div class="header-title">Students medical app</div>
+          </div>
+        </div>
+        
+        <!-- Навигационное меню -->
+        <nav class="header-menu">
+            <ul class="menu">
+            <li><a href="home.html">Главное</a></li>
+            <li><a href="https://www.kstu.kz/" target="_blank">Оф.сайт университета</a></li>
+            <li><a href="https://egov.kz/cms/kk" target="_blank">egov</a></li>
+            </ul>
+            <ul class="menu exit">
+              <li><a href="#" id="changePasswordBtn">Сменить пароль</a></li>
+              <li><a href="login.html">Выход</a></li>
+            </ul>            
+        </nav>
+        
+    </header>
+      
+
+    <main class="main-content">
+      <section class="center-content">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0;">Студенты вашей группы</h2>
+            <span id="curatorGroupInfo" style="font-size: 1rem; color: #333;"></span>
+          </div>          
+        <div id="studentList"></div>
+        <div id="dynamicContent"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      © 2025 Students medical app
+    </footer>
+  </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const group = localStorage.getItem('curatorGroup');
+    const groupElement = document.getElementById('curatorGroupInfo');
+  
+    if (group && groupElement) {
+      groupElement.textContent = `Ваша группа: ${group}`;
+    }
+  });
+
+  document.getElementById('changePasswordBtn').addEventListener('click', () => {
+  const content = document.getElementById('dynamicContent');
+  content.innerHTML = `
+    <h3>Смена пароля</h3>
+    <input type="password" id="oldPassword" placeholder="Старый пароль" />
+    <input type="password" id="newPassword" placeholder="Новый пароль" />
+    <div id="passwordError" style="color:red; margin-bottom:0.5rem;"></div>
+    <button id="submitPasswordChange">Изменить пароль</button>
+  `;
+
+  document.getElementById('submitPasswordChange').addEventListener('click', () => {
+    const oldPassword = document.getElementById('oldPassword').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const role = localStorage.getItem('role');
+    const id = localStorage.getItem(`${role}Id`);
+    const errorBlock = document.getElementById('passwordError');
+
+    if (!oldPassword || !newPassword) {
+      errorBlock.textContent = 'Заполните все поля';
+      return;
+    }
+
+    fetch('http://localhost:3000/api/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role, id, oldPassword, newPassword })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message.includes("Пароль должен")) {
+          errorBlock.textContent = data.message;
+        } else {
+          errorBlock.textContent = '';
+          alert(data.message);
+          document.getElementById('oldPassword').value = '';
+          document.getElementById('newPassword').value = '';
+        }
+      })
+      .catch(err => {
+        console.error('Ошибка:', err);
+        errorBlock.textContent = 'Ошибка при смене пароля';
+      });
+  });
+});
+  </script>
+
+  <script src="curator-dashboard.js"></script>
+</body>
+</html>

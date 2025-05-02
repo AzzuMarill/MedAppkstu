@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Главная</title>
+  <link rel="stylesheet" href="univer-style.css">
+</head>
+<body>
+    <div class="page-wrapper">
+      <!-- Навигационное меню -->
+      <header class="header">
+        <div class="header-top">
+          <img src="img/logo.png" alt="Logo" class="header-logo" />
+          <div class="header-title">Students medical app</div>
+        </div>
+        <nav class="header-menu">
+          <ul class="menu">
+            <li><a href="home.html">Главное</a></li>
+            <li><a href="#" id="profileLink">Мой профиль</a></li>
+            <li><a href="https://www.kstu.kz/" target="_blank">Оф.сайт университета</a></li>
+            <li><a href="https://egov.kz/cms/kk" target="_blank">egov</a></li>
+          </ul>
+          <ul class="menu exit">
+            <li><a href="login.html" onclick="localStorage.clear()">Выход</a></li>
+          </ul>
+        </nav>
+      </header>
+
+
+
+  <!-- Основной контент -->
+  <div class="main-content">
+
+    <!-- Центральная часть (новости) -->
+    <section class="center-content">
+      <h2>Новости</h2>
+      <!-- Здесь будут динамически добавляться новости -->
+    </section>
+  </div>
+
+  <!-- Подвал -->
+  <footer class="footer">
+    © 2025 Students medical app
+  </footer>
+  </div>
+
+  <!-- Скрипт для загрузки новостей -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('http://localhost:3000/api/news')
+        .then(response => response.json())
+        .then(data => {
+          const newsContainer = document.querySelector('.center-content');
+          data.forEach(news => {
+            const newsItem = document.createElement('div');
+            newsItem.classList.add('news-item');
+
+            const newsDate = new Date(news.date).toLocaleDateString('ru-RU');
+            let newsHTML = `
+              <div class="news-date">${newsDate}</div>
+              <div class="news-text"><strong>${news.title}:</strong> ${news.content}</div>
+            `;
+            if (news.imageUrl) {
+              newsHTML += `<img src="${news.imageUrl}" alt="${news.title}" class="news-image">`;
+            }
+            newsItem.innerHTML = newsHTML;
+            newsContainer.appendChild(newsItem);
+          });
+        })
+        .catch(error => {
+          console.error('Ошибка при получении новостей:', error);
+        });
+    });
+  </script>
+  
+  <script>
+    const role = localStorage.getItem('role');
+    const profileLink = document.getElementById('profileLink');
+  
+    if (role === 'doctor') {
+      profileLink.href = 'doctor-dashboard.html';
+    } else if (role === 'curator') {
+      profileLink.href = 'curator-dashboard.html';
+    } else {
+      profileLink.href = 'student-dashboard.html';
+    }
+  </script>  
+</body>
+</html>

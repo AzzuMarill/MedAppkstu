@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Профиль студента</title>
+  <div id="accessDeniedMessage" style="display:none; padding: 10px; background: #ffcccc; color: #a00; font-weight: bold; text-align: center;">
+    Доступ только для студентов. Перенаправление на страницу входа...
+  </div>
+  
+  <script>
+    const role = localStorage.getItem('role');
+    const id = localStorage.getItem('userId');
+    const allowedRole = 'student';
+    const messageBlock = document.getElementById('accessDeniedMessage');
+  
+    if (!id || role !== allowedRole) {
+      messageBlock.style.display = 'block';
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 3000);
+    }
+  </script>  
+  <link rel="stylesheet" href="univer-style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+<body>
+  <div class="page-wrapper">
+    <header class="header">
+      <div class="header-top">
+        <img src="img/logo.png" alt="Logo" class="header-logo" />
+        <div class="header-title">Students medical app</div>
+      </div>
+      <nav class="header-menu">
+        <ul class="menu">
+          <li><a href="home.html">Главное</a></li>
+          <li><a href="#" id="showFormBtn">Моя анкета</a></li>
+          <li><a href="https://www.kstu.kz/" target="_blank">Оф.сайт университета</a></li>
+          <li><a href="https://egov.kz/cms/kk" target="_blank">egov</a></li>
+        </ul>
+        <ul class="menu exit">
+          <li><a href="login.html" onclick="localStorage.clear()">Выход</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="main-content">
+      <aside class="left-sidebar">
+        <h3>Меню</h3>
+        <ul>
+          <li><a href="student-dashboard.html">Профиль</a></li>
+          <li><a href="#" id="showFormBtnSidebar">Моя анкета</a></li>
+          <li><a href="#" id="showVisitsBtn">Визиты к врачу</a></li>
+          <li><a href="#" id="showXrayBtn">Снимок флюорографии</a></li>
+          <li><a href="#" id="changePasswordBtn">Сменить пароль</a></li>
+        </ul>
+      </aside>
+
+      <section class="center-content">
+        <div id="welcomeBlock">
+          <h2>Добро пожаловать!</h2>
+          <div id="studentInfo" class="student-info" style="margin-bottom: 1.5rem;"></div>
+        </div>        
+        <div id="dynamicContent"></div>            
+      </section>
+    </div>
+
+    <footer class="footer">
+      © 2025 Students medical app
+    </footer>
+  </div>
+
+  <script>
+    const studentId = localStorage.getItem('studentId');
+    const fio = localStorage.getItem('studentFio');
+    const email = localStorage.getItem('studentEmail');
+    // Загрузка данных студента
+    fetch(`http://localhost:3000/api/student-profile/${studentId}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('studentInfo').innerHTML = `
+        <p><strong>ФИО:</strong> <span id="studentName">${fio}</span></p>
+        <p><strong>Email:</strong> <span id="studentEmail">${email}</span></p>`;
+      });
+
+    // === АНКЕТА ===
+    function showMedicalForm(e) {
+      e.preventDefault();
+      document.getElementById('welcomeBlock').style.display = 'none';
+      const content = document.getElementById('dynamicContent');
+      fetch('long-form.html')
+        .then(res => res.text())
+        .then(html => {
+          const temp = document.createElement('div');
+          temp.innerHTML = html;
+          const form = temp.querySelector('form');
+          if (form) {
+            content.innerHTML = '<h2>Анкета студента</h2>';
+            content.appendChild(form);
+            loadFormData();
+            setupMedicalFormSubmit();
+          }
+        });
+    }
+
+    document.getElementById('showFormBtn').addEventListener('click', showMedicalForm);
+    document.getElementById('showFormBtnSidebar').addEventListener('click', showMedicalForm);
+
+    function loadFormData() {
+      const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
+      fetch(`http://localhost:3000/api/medical-data/${studentId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data || data.message) return;
+          document.getElementById('fullName').value = data.full_name || '';
+          document.getElementById('email').value = data.email || '';
+          document.getElementById('phone').value = data.phone || '';
+          document.getElementById('dob').value = data.dob || '';
+          document.querySelector(`input[name="gender"][value="${data.gender}"]`)?.click();
+          document.getElementById('occupation').value = data.occupation || '';
+          document.getElementById('address').value = data.address || '';
+          document.getElementById('emergencyContact').value = data.emergency_contact || '';
+          document.getElementById('emergencyNumber').value = data.emergency_number || '';
+          document.getElementById('primaryPhysician').value = data.primary_physician || '';
+          document.getElementById('treatingDoctor').value = data.treatingDoctor || '';
+          document.getElementById('allergies').value = data.allergies || '';
+          document.getElementById('currentMedication').value = data.current_medication || '';
+          document.getElementById('familyHistory').value = data.family_history || '';
+          document.getElementById('pastHistory').value = data.past_history || '';
+        });
+    }
+
+    // === ВИЗИТЫ ===
+    document.getElementById('showVisitsBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('welcomeBlock').style.display = 'none';
+      const content = document.getElementById('dynamicContent');
+      fetch(`http://localhost:3000/api/doctor-visits/student/${studentId}`)
+        .then(res => res.json())
+        .then(visits => {
+          if (!Array.isArray(visits)) {
+            content.innerHTML = '<p>Нет визитов.</p>';
+            return;
+          }
+          content.innerHTML = `
+          <h3>Мои визиты</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Жалобы</th>
+                <th>Врач</th>
+                <th>Освобождение</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${visits.map(v => `
+                <tr>
+                  <td>${v.visit_date}</td>
+                  <td>${v.complaints}</td>
+                  <td>${v.doctor_name}</td>
+                  <td>
+                    ${v.exemption_file
+                      ? `<a href="http://localhost:3000${v.exemption_file}" download>📄 Скачать</a>`
+                      : '—'}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        });
+    });
+
+    // === ФЛЮОРОГРАФИЯ ===
+    document.getElementById('showXrayBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('welcomeBlock').style.display = 'none';
+      const content = document.getElementById('dynamicContent');
+      content.innerHTML = `
+        <h3>Снимок флюорографии</h3>
+        <div style="margin-bottom: 1rem;">
+          <input type="file" id="xrayUpload" accept="image/*" />
+          <button id="uploadBtn">Загрузить</button>
+        </div>
+        <div id="xrayPreview">Загрузка...</div>
+      `;
+      loadXray();
+
+      document.getElementById('uploadBtn').addEventListener('click', () => {
+        const file = document.getElementById('xrayUpload').files[0];
+        if (!file) return alert("Выберите файл для загрузки");
+
+        const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('studentId', studentId);
+
+        fetch('http://localhost:3000/api/xray-upload', {
+          method: 'POST',
+          body: formData
+        })
+          .then(res => res.json())
+          .then(data => {
+            alert(data.message || 'Загружено');
+            loadXray();
+          })
+          .catch(err => {
+            console.error(err);
+            alert('Ошибка при загрузке снимка');
+          });
+      });
+    });
+
+    function loadXray() {
+      const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
+      fetch(`http://localhost:3000/api/xray/${studentId}`)
+        .then(res => res.json())
+        .then(data => {
+          const preview = document.getElementById('xrayPreview');
+          if (!data || !data.imageUrl) {
+            preview.innerHTML = "<p>Снимок не загружен.</p>";
+            return;
+          }
+          preview.innerHTML = `
+            <p>Загруженный снимок:</p>
+            <img src="http://localhost:3000${data.imageUrl}" style="max-width: 300px;" />
+            <br><br>
+            <a href="http://localhost:3000${data.imageUrl}" download>Скачать</a> |
+            <button onclick="deleteXray()">Удалить</button>
+          `;
+        })
+        .catch(() => {
+          document.getElementById('xrayPreview').innerHTML = "<p>Ошибка при загрузке снимка.</p>";
+        });
+    }
+
+    function deleteXray() {
+      if (!confirm("Удалить снимок?")) return;
+      const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
+      fetch(`http://localhost:3000/api/xray/${studentId}`, {
+        method: 'DELETE'
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message || 'Удалено');
+          document.getElementById('xrayPreview').innerHTML = "<p>Снимок удалён.</p>";
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Ошибка при удалении");
+        });
+    }
+  
+function setupMedicalFormSubmit() {
+  const form = document.querySelector('.big-form');
+  if (!form) return;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    document.getElementById('welcomeBlock').style.display = 'none';
+
+    const formData = {
+      student_id: localStorage.getItem('studentId'),
+      full_name: document.getElementById('fullName').value,
+      email: document.getElementById('email').value,
+      phone: document.getElementById('phone').value,
+      dob: document.getElementById('dob').value,
+      gender: document.querySelector('input[name="gender"]:checked')?.value,
+      occupation: document.getElementById('occupation').value,
+      address: document.getElementById('address').value,
+      emergency_contact: document.getElementById('emergencyContact').value,
+      emergency_number: document.getElementById('emergencyNumber').value,
+      primary_physician: document.getElementById('primaryPhysician').value,
+      treatingDoctor: document.getElementById('treatingDoctor').value,
+      allergies: document.getElementById('allergies').value,
+      current_medication: document.getElementById('currentMedication').value,
+      family_history: document.getElementById('familyHistory').value,
+      past_history: document.getElementById('pastHistory').value,
+    };
+
+    fetch("http://localhost:3000/api/medical-data", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || 'Анкета отправлена!');
+    })
+    .catch(err => {
+      console.error('Ошибка при отправке анкеты:', err);
+      alert('Ошибка при отправке анкеты');
+    });
+  });
+}
+
+function changePassword() {
+  const oldPassword = document.getElementById('oldPassword').value.trim();
+  const newPassword = document.getElementById('newPassword').value.trim();
+  const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
+
+  if (!oldPassword || !newPassword) {
+    alert('Пожалуйста, заполните оба поля.');
+    return;
+  }
+
+  fetch("http://localhost:3000/api/change-password/student", {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: studentId, oldPassword, newPassword })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message);
+    document.getElementById('oldPassword').value = '';
+    document.getElementById('newPassword').value = '';
+  })
+  .catch(err => {
+    console.error('Ошибка при смене пароля:', err);
+    alert('Произошла ошибка. Попробуйте снова.');
+  });
+}
+document.getElementById('changePasswordBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  document.getElementById('welcomeBlock').style.display = 'none';
+  const content = document.getElementById('dynamicContent');
+  content.innerHTML = `
+    <h3>Смена пароля</h3>
+    <input type="password" id="oldPassword" placeholder="Старый пароль" />
+    <input type="password" id="newPassword" placeholder="Новый пароль" />
+    <div id="passwordError" class="error-message" style="color: red; margin-top: 0.5rem;"></div>
+    <button id="submitPasswordChange">Изменить пароль</button>
+  `;
+
+  document.getElementById('submitPasswordChange').addEventListener('click', () => {
+    const oldPassword = document.getElementById('oldPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const errorBlock = document.getElementById('passwordError');
+    const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
+
+    fetch('http://localhost:3000/api/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        role: 'student',
+        id: localStorage.getItem('studentId'),
+        oldPassword,
+        newPassword
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message.includes("Пароль должен")) {
+          errorBlock.textContent = data.message;
+        } else {
+          errorBlock.textContent = '';
+          alert(data.message);
+          document.getElementById('oldPassword').value = '';
+          document.getElementById('newPassword').value = '';
+        }
+      })
+      .catch(err => {
+        console.error('Ошибка при смене пароля:', err);
+        errorBlock.textContent = 'Ошибка при смене пароля';
+      });
+  });
+});
+  document.addEventListener("DOMContentLoaded", () => {
+    const fio = localStorage.getItem('studentFio');
+    const email = localStorage.getItem('studentEmail');
+
+    if (!fio || !email) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    const nameEl = document.getElementById('studentName');
+    const emailEl = document.getElementById('studentEmail');
+
+    if (nameEl) nameEl.textContent = fio;
+    if (emailEl) emailEl.textContent = email;
+  });
+</script>
+
+</body>
+</html>

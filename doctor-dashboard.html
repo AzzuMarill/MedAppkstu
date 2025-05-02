@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кабинет врача</title>
+  <link rel="stylesheet" href="univer-style.css" />
+  <style>
+    .main-content {
+      display: flex;
+      flex-direction: row-reverse;
+      margin: 0;
+    }
+    .right-sidebar {
+      width: 220px;
+      background-color: var(--aside-bg);
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+      margin-left: 1rem;
+    }
+    .left-panel {
+      flex: 1;
+      background-color: var(--content-bg);
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+    }
+    #searchInput {
+      width: 300px;
+      margin-bottom: 0.5rem;
+    }
+    .modal {
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background-color: #fff;
+      padding: 2rem;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      width: 400px;
+      max-width: 90%;
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      top: 0.5rem;
+      right: 1rem;
+      cursor: pointer;
+      font-size: 1.4rem;
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+  <!-- Навигационное меню -->
+  <header class="header">
+    <div class="header-top">
+      <img src="img/logo.png" alt="Logo" class="header-logo" />
+      <div class="header-title">Students medical app</div>
+    </div>
+    <nav class="header-menu">
+      <ul class="menu">
+        <li><a href="home.html">Главное</a></li>
+        <li><a href="#" id="profileLink">Мой профиль</a></li>
+        <li><a href="https://www.kstu.kz/" target="_blank">Оф.сайт университета</a></li>
+        <li><a href="https://egov.kz/cms/kk" target="_blank">egov</a></li>
+      </ul>
+      <ul class="menu exit">
+        <li><a href="login.html">Выход</a></li>
+      </ul>
+    </nav>
+  </header>
+
+
+  <div class="main-content">
+    <aside class="right-sidebar">
+      <h3>Меню</h3>
+      <ul style="list-style: none; padding-left: 0;">
+        <li><a href="#" onclick="showStudentForms(event)">Анкеты студентов</a></li>
+        <li><a href="#" onclick="showVisits(event)">Записать визит</a></li>
+        <li><a href="#" onclick="showDoctorVisits(event)">Мои визиты</a></li>
+        <li><a href="#" id="changePasswordBtn">Сменить пароль</a></li>
+      </ul>
+    </aside>
+
+    <section class="left-panel">
+      <h2>Основная панель</h2>
+      <div id="content">
+        <h3>Добро пожаловать!</h3>
+        <p>Здесь вы можете просматривать анкеты студентов, записывать визиты и управлять паролем.</p>
+        <div style="display: flex; justify-content: space-around; margin-top: 2rem;">
+          <div><strong>👥 Студентов:</strong><br><span id="countStudents">–</span></div>
+          <div><strong>📋 Анкет:</strong><br><span id="countForms">–</span></div>
+          <div><strong>📆 Визитов:</strong><br><span id="countVisits">–</span></div>
+        </div>
+      </div>      
+    </section>
+  </div>
+
+  <footer class="footer">
+    © 2025 Students medical app
+  </footer>
+</div>
+
+<div id="modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h3>Медицинская анкета</h3>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+let allStudents = [];
+
+function showStudentForms(e) {
+  e.preventDefault();
+  const contentHtml = `
+    <h3>Анкеты студентов</h3>
+    <input type="text" id="searchInput" placeholder="Поиск по ФИО или группе..." onkeyup="filterStudents()" />
+    <table id="studentsTable">
+      <thead>
+        <tr><th>ФИО</th><th>Группа</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  `;
+  document.getElementById('content').innerHTML = contentHtml;
+
+  if (allStudents.length === 0) {
+    fetch('http://localhost:3000/api/students-list')
+      .then(res => res.json())
+      .then(data => {
+        allStudents = data;
+        renderStudentsTable(allStudents);
+      });
+  } else {
+    renderStudentsTable(allStudents);
+  }
+}
+
+function renderStudentsTable(students) {
+  const tbody = document.querySelector('#studentsTable tbody');
+  tbody.innerHTML = '';
+  students.forEach(stud => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><a href="#" onclick="openStudentModal(${stud.id})">${stud.fio}</a></td>
+      <td>${stud.group_name || ''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterStudents() {
+  const searchValue = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allStudents.filter(stud => {
+    return stud.fio.toLowerCase().includes(searchValue) || (stud.group_name || '').toLowerCase().includes(searchValue);
+  });
+  renderStudentsTable(filtered);
+}
+
+function openStudentModal(studentId) {
+  fetch(`http://localhost:3000/api/medical-data/${studentId}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.message) {
+        document.getElementById('modal-body').innerHTML = `<p>${data.message}</p>`;
+      } else {
+        document.getElementById('modal-body').innerHTML = `
+          <p><strong>Полное имя:</strong> ${data.full_name || ''}</p>
+          <p><strong>Email:</strong> ${data.email || ''}</p>
+          <p><strong>Телефон:</strong> ${data.phone || ''}</p>
+          <p><strong>Дата рождения:</strong> ${data.dob || ''}</p>
+          <p><strong>Пол:</strong> ${data.gender || ''}</p>
+          <p><strong>Группа:</strong> ${data.occupation || ''}</p>
+          <p><strong>Адрес:</strong> ${data.address || ''}</p>
+          <p><strong>Контакт в экстренном случае:</strong> ${data.emergency_contact || ''} (${data.emergency_number || ''})</p>
+          <p><strong>Лечащий врач:</strong> ${data.primary_physician || ''}</p>
+          <p><strong>Аллергии:</strong> ${data.allergies || ''}</p>
+          <p><strong>Текущие лекарства:</strong> ${data.current_medication || ''}</p>
+          <p><strong>Семейный анамнез:</strong> ${data.family_history || ''}</p>
+          <p><strong>Прошлые заболевания:</strong> ${data.past_history || ''}</p>
+        `;
+      }
+      document.getElementById('modal').style.display = 'flex';
+    });
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+function showVisits(e) {
+  e.preventDefault();
+  document.getElementById('content').innerHTML = `
+    <h3>Запись визита студента</h3>
+    <form id="visitForm" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="studentSearch">Поиск студента</label>
+        <input type="text" id="studentSearch" placeholder="Введите ФИО..." autocomplete="off" />
+        <ul id="studentSuggestions" style="list-style: none; padding-left: 0; margin-top: 0.3rem;"></ul>
+        <input type="hidden" id="studentId" />
+      </div>
+      <div class="form-group">
+        <label for="visitDate">Дата визита</label>
+        <input type="datetime-local" id="visitDate" required />
+      </div>
+      <div class="form-group">
+        <label for="complaints">Причина обращения</label>
+        <input type="text" id="complaints" required />
+      </div>
+      <div class="form-group">
+        <label><input type="checkbox" id="isExempted" /> Освобождение от занятий</label>
+      </div>
+      <div class="form-group" id="fileField" style="display: none;">
+        <label for="exemptionFile">Файл освобождения</label>
+        <input type="file" id="exemptionFile" accept=".pdf,.jpg,.png" />
+      </div>
+      <button type="submit" class="btn-submit">Сохранить визит</button>
+    </form>
+  `;
+
+  let students = [];
+  fetch('http://localhost:3000/api/students-list')
+    .then(res => res.json())
+    .then(data => {
+      students = data;
+    });
+
+  document.getElementById('visitDate').value = new Date().toISOString().slice(0,16);
+
+  document.getElementById('studentSearch').addEventListener('input', function () {
+    const query = this.value.trim().toLowerCase();
+    const ul = document.getElementById('studentSuggestions');
+    ul.innerHTML = '';
+    document.getElementById('studentId').value = '';
+
+    const matched = students.find(s => s.fio.toLowerCase() === query);
+    if (matched) {
+      document.getElementById('studentId').value = matched.id;
+    }
+
+    const filtered = students.filter(s => s.fio.toLowerCase().includes(query)).slice(0, 10);
+    filtered.forEach(st => {
+      const li = document.createElement('li');
+      li.textContent = `${st.fio} (${st.group_name || ''})`;
+      li.style.cursor = 'pointer';
+      li.onclick = () => {
+        document.getElementById('studentSearch').value = st.fio;
+        document.getElementById('studentId').value = st.id;
+        ul.innerHTML = '';
+      };
+      ul.appendChild(li);
+    });
+  });
+
+  document.getElementById('isExempted').onchange = function () {
+    document.getElementById('fileField').style.display = this.checked ? 'block' : 'none';
+  };
+
+  document.getElementById('visitForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const doctorId = localStorage.getItem('doctorId');
+    const studentId = document.getElementById('studentId').value.trim();
+    const visitDate = document.getElementById('visitDate').value;
+    const complaints = document.getElementById('complaints').value.trim();
+    const isExempted = document.getElementById('isExempted').checked;
+    const exemptionFile = document.getElementById('exemptionFile').files[0];
+
+    console.log("Отправка визита:", { doctorId, studentId, visitDate, complaints });
+
+    if (!doctorId || !studentId || !visitDate || !complaints) {
+      alert('Заполните все обязательные поля. Обязательно выберите студента из списка.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('doctorId', doctorId);
+    formData.append('studentId', studentId);
+    formData.append('visitDate', visitDate);
+    formData.append('complaints', complaints);
+    formData.append('isExempted', isExempted ? '1' : '0');
+    if (isExempted) {
+      if (!exemptionFile) {
+        alert('Если выбрано освобождение, прикрепите файл.');
+        return;
+      }
+      formData.append('exemptionFile', exemptionFile);
+    }
+
+    try {
+      const res = await fetch('http://localhost:3000/api/doctor-visits', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      alert(data.message || 'Визит сохранён!');
+      this.reset();
+      document.getElementById('fileField').style.display = 'none';
+      document.getElementById('studentSuggestions').innerHTML = '';
+    } catch (err) {
+      console.error('Ошибка при отправке:', err);
+      alert('Ошибка при отправке данных');
+    }
+  });
+}
+
+function showDoctorVisits(e) {
+  e.preventDefault();
+  const doctorId = localStorage.getItem('doctorId');
+  if (!doctorId) return alert("Не удалось определить врача");
+
+  fetch(`http://localhost:3000/api/doctor-visits/doctor/${doctorId}`)
+    .then(res => res.json())
+    .then(data => {
+      const content = document.getElementById('content');
+      if (!Array.isArray(data) || data.length === 0) {
+        content.innerHTML = '<p>Визитов не найдено.</p>';
+        return;
+      }
+
+      content.innerHTML = `
+        <h3>Мои визиты</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Студент</th>
+              <th>Дата визита</th>
+              <th>Жалобы</th>
+              <th>Освобождение</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.map(visit => `
+              <tr>
+                <td>${visit.student_name}</td>
+                <td>${visit.visit_date}</td>
+                <td>${visit.complaints}</td>
+                <td>
+                  ${visit.exemption_file 
+                    ? `<a href="http://localhost:3000${visit.exemption_file}" download>📄 Скачать</a>` 
+                    : '—'}
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    })
+    .catch(err => {
+      console.error('Ошибка при загрузке визитов врача:', err);
+      alert('Ошибка при загрузке визитов');
+    });
+}
+
+document.getElementById('changePasswordBtn').addEventListener('click', () => {
+  const content = document.getElementById('content');
+  content.innerHTML = `
+    <h3>Смена пароля</h3>
+    <input type="password" id="oldPassword" placeholder="Старый пароль" />
+    <input type="password" id="newPassword" placeholder="Новый пароль" />
+    <div id="passwordError" style="color:red; margin-bottom:0.5rem;"></div>
+    <button id="submitPasswordChange">Изменить пароль</button>
+  `;
+
+  document.getElementById('submitPasswordChange').addEventListener('click', () => {
+    const oldPassword = document.getElementById('oldPassword').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const role = localStorage.getItem('role');
+    const id = localStorage.getItem(`${role}Id`);
+    const errorBlock = document.getElementById('passwordError');
+
+    if (!oldPassword || !newPassword) {
+      errorBlock.textContent = 'Заполните все поля';
+      return;
+    }
+
+    fetch('http://localhost:3000/api/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role, id, oldPassword, newPassword })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message.includes("Пароль должен")) {
+          errorBlock.textContent = data.message;
+        } else {
+          errorBlock.textContent = '';
+          alert(data.message);
+          document.getElementById('oldPassword').value = '';
+          document.getElementById('newPassword').value = '';
+        }
+      })
+      .catch(err => {
+        console.error('Ошибка:', err);
+        errorBlock.textContent = 'Ошибка при смене пароля';
+      });
+  });
+});
+// Загружаем статистику
+const doctorId = localStorage.getItem('doctorId');
+if (doctorId) {
+  fetch(`http://localhost:3000/api/doctor-dashboard-stats/${doctorId}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('countStudents').textContent = data.students || 0;
+      document.getElementById('countForms').textContent = data.forms || 0;
+      document.getElementById('countVisits').textContent = data.visits || 0;
+    })
+    .catch(err => {
+      console.error('Ошибка при загрузке статистики:', err);
+    });
+}
+
+</script>
+</body>
+</html>

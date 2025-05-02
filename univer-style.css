@@ -1,0 +1,424 @@
+/* univer-style.css */
+
+/* Цветовая гамма, похожая на классические университетские порталы */
+:root {
+  --main-bg: #f0f4fa;       /* Фон страницы */
+  --header-bg: #e5edf8;     /* Фон шапки/меню */
+  --border-color: #c0c0c0;  /* Светло-серый для границ */
+  --menu-hover: #d5deec;    /* При наведении на меню */
+  --text-color: #333;       /* Основной цвет текста */
+  --link-color: #0000cc;    /* Цвет ссылок */
+  --button-bg: #1abc9c;     /* Цвет кнопок */
+  --button-hover: #16a085;  /* При hover */
+  --aside-bg: #fff;         /* Цвет фона левой колонки */
+  --content-bg: #fff;       /* Цвет фона центральной части */
+}
+
+.improved-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #e7eef5;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ccc;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-logo {
+  height: 45px;
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1a2e35;
+}
+.curator-group-info {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+
+.stat-box {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  background-color: #f8f9fa;
+  display: inline-block;
+  min-width: 200px;
+  margin: 1rem 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-box h2 {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.stat-box p {
+  margin: 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Сброс */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+/* Базовые стили */
+body {
+  background-color: var(--main-bg);
+  color: var(--text-color);
+}
+
+/* Шапка */
+.header {
+  border-bottom: 2px solid var(--border-color);
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  background-color: var(--header-bg);
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.header-logo {
+  max-height: 50px;
+  margin-right: 1rem;
+}
+.header-title {
+  font-weight: bold;
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+.header-menu {
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+.header-menu ul {
+  display: flex;
+  list-style: none;
+}
+.header-menu li a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: var(--text-color);
+  text-decoration: none;
+  border-right: 1px solid var(--border-color);
+}
+.header-menu li:last-child a {
+  border-right: none;
+}
+.header-menu li a:hover {
+  background-color: var(--menu-hover);
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 0.25rem;
+}
+
+/* Основная часть (контейнер) */
+.main-content {
+  display: flex;
+  margin: 0;
+  min-height: 70vh;
+}
+
+/* Левая колонка */
+.left-sidebar {
+  width: 220px;
+  background-color: var(--aside-bg);
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+  margin-right: 1rem;
+}
+.left-sidebar h3 {
+  margin-bottom: 0.5rem;
+}
+.left-sidebar ul {
+  list-style: none;
+}
+.left-sidebar li {
+  margin-bottom: 0.5rem;
+}
+.left-sidebar li a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+.left-sidebar li a:hover {
+  text-decoration: underline;
+}
+
+/* Центральная часть */
+.center-content {
+  flex: 1;
+  background-color: var(--content-bg);
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 0.5rem;
+  background-color: var(--header-bg);
+  border-top: 2px solid var(--border-color);
+  margin-top: 1rem;
+}
+
+/* Формы */
+.form-group {
+  margin-bottom: 1rem;
+}
+label {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+input, select, textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+.btn-submit {
+  background-color: var(--button-bg);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-submit:hover {
+  background-color: var(--button-hover);
+}
+
+/* Таблицы */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+table th, table td {
+  border: 1px solid var(--border-color);
+  padding: 0.5rem;
+}
+table thead {
+  background-color: var(--header-bg);
+}
+table tr:hover {
+  background-color: #f7faff;
+}
+
+/* Карточки (пример для админ-статистики) */
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card {
+  background-color: #f1f5ff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 1rem;
+  width: 200px;
+  text-align: center;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+.card h3 {
+  font-size: 1.6rem;
+}
+
+/* Модальное окно (для админки) */
+.modal {
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+.modal-content {
+  background-color: #fff;
+  color: var(--text-color);
+  margin: 10% auto;
+  padding: 2rem;
+  width: 300px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+.close {
+  float: right;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+.close:hover {
+  color: #999;
+}
+
+#dob {
+  width: 150px;     
+  max-width: 100%;   
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--main-bg);
+  color: var(--text-color);
+}
+
+:root {
+  --border-color: #ddd;
+  --card-bg: #fff;
+  --text-color: #333;
+  --card-radius: 8px;
+}
+
+/* Стили для блока новости */
+.news-item {
+  width: 100%;                
+  max-width: 1100px;          
+  margin: 2rem 0;           
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+
+/* Стили для даты новости */
+.news-date {
+  color: #888;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+/* Стили для основного текста новости */
+.news-text {
+  margin-bottom: 0.5rem;
+}
+
+/* Стили для картинки новости */
+.news-image {
+  max-width: 80%;
+  height: auto;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+.page-wrapper {
+  width: 90%;                 
+  max-width: 1200px;        
+  margin: 1rem auto;          
+  border: 1px solid #ccc;    
+  border-radius: 6px;        
+  background-color: #fff;     
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  padding: 1rem;              
+}
+
+.header-menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--header-bg, #e8f0fc);
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 0;
+}
+
+.header-menu .menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-menu .menu li a {
+  display: block;
+  padding: 10px 20px;
+  text-decoration: none;
+  color: var(--text-color, #000);
+  border-right: 1px solid #ccc;
+}
+
+.header-menu .menu li:last-child a {
+  border-right: none;
+}
+
+.header-menu .menu li a:hover {
+  background-color: #d6e4f0;
+}
+
+.header-menu .exit {
+  margin-left: auto;
+}
+
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.btn-submit, .btn-cancel {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.btn-submit {
+  background-color: #1cbbb4;
+  color: white;
+}
+
+.btn-cancel {
+  background-color: #ccc;
+  color: #333;
+}
