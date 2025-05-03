@@ -422,3 +422,49 @@ body {
   background-color: #ccc;
   color: #333;
 }
+
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  header, nav, .main-content, .card, .box {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .header-menu ul {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .header-menu ul li {
+    display: block;
+    width: 100%;
+  }
+
+  .form-section, .info-box, .student-list, .news-box {
+    margin-bottom: 20px;
+    padding: 10px;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  button {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  table {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .footer {
+    text-align: center;
+    font-size: 14px;
+  }
+}
