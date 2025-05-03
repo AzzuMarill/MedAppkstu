@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
   
       // Отправляем запрос на сервер
-      fetch('http://localhost:3000/api/medical-data', {
+      fetch('https://medapp-to7o.onrender.com/api/medical-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -58,10 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
       })
         .then(res => res.json())
         .then(data => {
-          // Если сервер ответил успешно
           alert(data.message || 'Данные сохранены!');
-          // Можно перенаправить на другую страницу, если нужно
-          // window.location.href = 'thank-you.html';
         })
         .catch(err => {
           console.error('Ошибка при отправке формы:', err);

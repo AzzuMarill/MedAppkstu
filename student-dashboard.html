@@ -75,7 +75,7 @@
     const fio = localStorage.getItem('studentFio');
     const email = localStorage.getItem('studentEmail');
     // Загрузка данных студента
-    fetch(`http://localhost:3000/api/student-profile/${studentId}`)
+    fetch(`https://medapp-to7o.onrender.com/api/student-profile/${studentId}`)
       .then(res => res.json())
       .then(data => {
         document.getElementById('studentInfo').innerHTML = `
@@ -108,7 +108,7 @@
 
     function loadFormData() {
       const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
-      fetch(`http://localhost:3000/api/medical-data/${studentId}`)
+      fetch(`https://medapp-to7o.onrender.com/api/medical-data/${studentId}`)
         .then(res => res.json())
         .then(data => {
           if (!data || data.message) return;
@@ -135,7 +135,7 @@
       e.preventDefault();
       document.getElementById('welcomeBlock').style.display = 'none';
       const content = document.getElementById('dynamicContent');
-      fetch(`http://localhost:3000/api/doctor-visits/student/${studentId}`)
+      fetch(`https://medapp-to7o.onrender.com/api/doctor-visits/student/${studentId}`)
         .then(res => res.json())
         .then(visits => {
           if (!Array.isArray(visits)) {
@@ -161,7 +161,7 @@
                   <td>${v.doctor_name}</td>
                   <td>
                     ${v.exemption_file
-                      ? `<a href="http://localhost:3000${v.exemption_file}" download>📄 Скачать</a>`
+                      ? `<a href="https://medapp-to7o.onrender.com${v.exemption_file}" download>📄 Скачать</a>`
                       : '—'}
                   </td>
                 </tr>
@@ -196,7 +196,7 @@
         formData.append('image', file);
         formData.append('studentId', studentId);
 
-        fetch('http://localhost:3000/api/xray-upload', {
+        fetch('https://medapp-to7o.onrender.com/api/xray-upload', {
           method: 'POST',
           body: formData
         })
@@ -214,7 +214,7 @@
 
     function loadXray() {
       const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
-      fetch(`http://localhost:3000/api/xray/${studentId}`)
+      fetch(`https://medapp-to7o.onrender.com/api/xray/${studentId}`)
         .then(res => res.json())
         .then(data => {
           const preview = document.getElementById('xrayPreview');
@@ -224,9 +224,9 @@
           }
           preview.innerHTML = `
             <p>Загруженный снимок:</p>
-            <img src="http://localhost:3000${data.imageUrl}" style="max-width: 300px;" />
+            <img src="https://medapp-to7o.onrender.com${data.imageUrl}" style="max-width: 300px;" />
             <br><br>
-            <a href="http://localhost:3000${data.imageUrl}" download>Скачать</a> |
+            <a href="https://medapp-to7o.onrender.com${data.imageUrl}" download>Скачать</a> |
             <button onclick="deleteXray()">Удалить</button>
           `;
         })
@@ -238,7 +238,7 @@
     function deleteXray() {
       if (!confirm("Удалить снимок?")) return;
       const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
-      fetch(`http://localhost:3000/api/xray/${studentId}`, {
+      fetch(`https://medapp-to7o.onrender.com/api/xray/${studentId}`, {
         method: 'DELETE'
       })
         .then(res => res.json())
@@ -279,7 +279,7 @@ function setupMedicalFormSubmit() {
       past_history: document.getElementById('pastHistory').value,
     };
 
-    fetch("http://localhost:3000/api/medical-data", {
+    fetch("https://medapp-to7o.onrender.com/api/medical-data", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
@@ -305,7 +305,7 @@ function changePassword() {
     return;
   }
 
-  fetch("http://localhost:3000/api/change-password/student", {
+  fetch("https://medapp-to7o.onrender.com/api/change-password/student", {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id: studentId, oldPassword, newPassword })
@@ -339,7 +339,7 @@ document.getElementById('changePasswordBtn').addEventListener('click', (e) => {
     const errorBlock = document.getElementById('passwordError');
     const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
 
-    fetch('http://localhost:3000/api/change-password', {
+    fetch('https://medapp-to7o.onrender.com/api/change-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

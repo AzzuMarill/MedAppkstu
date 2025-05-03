@@ -15,7 +15,7 @@ document.getElementById('changePasswordForm').addEventListener('submit', functio
       return alert('Новый пароль и подтверждение не совпадают');
     }
   
-    fetch(`http://localhost:3000/api/${role}-change-password`, {
+    fetch(`https://medapp-to7o.onrender.com/api/${role}-change-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: userId, oldPassword, newPassword })

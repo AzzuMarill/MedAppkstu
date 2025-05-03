@@ -136,7 +136,7 @@ function showStudentForms(e) {
   document.getElementById('content').innerHTML = contentHtml;
 
   if (allStudents.length === 0) {
-    fetch('http://localhost:3000/api/students-list')
+    fetch('https://medapp-to7o.onrender.com/api/students-list')
       .then(res => res.json())
       .then(data => {
         allStudents = data;
@@ -169,7 +169,7 @@ function filterStudents() {
 }
 
 function openStudentModal(studentId) {
-  fetch(`http://localhost:3000/api/medical-data/${studentId}`)
+  fetch(`https://medapp-to7o.onrender.com/api/medical-data/${studentId}`)
     .then(res => res.json())
     .then(data => {
       if (data.message) {
@@ -230,7 +230,7 @@ function showVisits(e) {
   `;
 
   let students = [];
-  fetch('http://localhost:3000/api/students-list')
+  fetch('https://medapp-to7o.onrender.com/api/students-list')
     .then(res => res.json())
     .then(data => {
       students = data;
@@ -298,7 +298,7 @@ function showVisits(e) {
     }
 
     try {
-      const res = await fetch('http://localhost:3000/api/doctor-visits', {
+      const res = await fetch('https://medapp-to7o.onrender.com/api/doctor-visits', {
         method: 'POST',
         body: formData
       });
@@ -319,7 +319,7 @@ function showDoctorVisits(e) {
   const doctorId = localStorage.getItem('doctorId');
   if (!doctorId) return alert("Не удалось определить врача");
 
-  fetch(`http://localhost:3000/api/doctor-visits/doctor/${doctorId}`)
+  fetch(`https://medapp-to7o.onrender.com/api/doctor-visits/doctor/${doctorId}`)
     .then(res => res.json())
     .then(data => {
       const content = document.getElementById('content');
@@ -347,7 +347,7 @@ function showDoctorVisits(e) {
                 <td>${visit.complaints}</td>
                 <td>
                   ${visit.exemption_file 
-                    ? `<a href="http://localhost:3000${visit.exemption_file}" download>📄 Скачать</a>` 
+                    ? `<a href="https://medapp-to7o.onrender.com${visit.exemption_file}" download>📄 Скачать</a>` 
                     : '—'}
                 </td>
               </tr>
@@ -384,7 +384,7 @@ document.getElementById('changePasswordBtn').addEventListener('click', () => {
       return;
     }
 
-    fetch('http://localhost:3000/api/change-password', {
+    fetch('https://medapp-to7o.onrender.com/api/change-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role, id, oldPassword, newPassword })
@@ -409,7 +409,7 @@ document.getElementById('changePasswordBtn').addEventListener('click', () => {
 // Загружаем статистику
 const doctorId = localStorage.getItem('doctorId');
 if (doctorId) {
-  fetch(`http://localhost:3000/api/doctor-dashboard-stats/${doctorId}`)
+  fetch(`https://medapp-to7o.onrender.com/api/doctor-dashboard-stats/${doctorId}`)
     .then(res => res.json())
     .then(data => {
       document.getElementById('countStudents').textContent = data.students || 0;

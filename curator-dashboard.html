@@ -97,7 +97,7 @@
       return;
     }
 
-    fetch('http://localhost:3000/api/change-password', {
+    fetch('https://medapp-to7o.onrender.com/api/change-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role, id, oldPassword, newPassword })

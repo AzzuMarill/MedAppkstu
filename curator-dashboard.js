@@ -5,7 +5,7 @@ if (!group) {
   window.location.href = "login.html";
 }
 
-fetch(`http://localhost:3000/api/curator/students/${group}`)
+fetch(`https://medapp-to7o.onrender.com/api/curator/students/${group}`)
   .then(res => res.json())
   .then(data => {
     const container = document.getElementById('studentList');
@@ -28,7 +28,7 @@ data.forEach(student => {
 
   if (student.image_path) {
     const img = document.createElement('img');
-    img.src = `http://localhost:3000${student.image_path}`;
+    img.src = `https://medapp-to7o.onrender.com${student.image_path}`;
     img.style.maxWidth = '200px';
     card.appendChild(img);
 
@@ -37,7 +37,7 @@ data.forEach(student => {
 
     const downloadLink = document.createElement('a');
     downloadLink.textContent = 'Скачать снимок';
-    downloadLink.href = `http://localhost:3000${student.image_path}`;
+    downloadLink.href = `https://medapp-to7o.onrender.com${student.image_path}`;
     
     // Чистим имя от лишних символов
     const cleanName = student.fio.replace(/\s+/g, '_').replace(/[^\w\d_]/g, '');

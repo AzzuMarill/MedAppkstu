@@ -48,7 +48,7 @@
   <!-- Скрипт для загрузки новостей -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      fetch('http://localhost:3000/api/news')
+      fetch('https://medapp-to7o.onrender.com/api/news')
         .then(response => response.json())
         .then(data => {
           const newsContainer = document.querySelector('.center-content');

@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function tryLoginAsStudent(login, password) {
-    return fetch("http://localhost:3000/api/student-login", {
+    return fetch("https://medapp-to7o.onrender.com/api/student-login", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ login, password })
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function tryLoginAsDoctor(login, password) {
-    return fetch("http://localhost:3000/api/doctor-login", {
+    return fetch("https://medapp-to7o.onrender.com/api/doctor-login", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ login, password })
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function tryLoginAsCurator(login, password) {
-    return fetch("http://localhost:3000/api/curator-login", {
+    return fetch("https://medapp-to7o.onrender.com/api/curator-login", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ login, password })

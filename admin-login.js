@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const res = await fetch('http://localhost:3000/api/admin-login', {
+      const res = await fetch('https://medapp-to7o.onrender.com/api/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ login, password })
@@ -62,7 +62,7 @@ function submitTelegramCode() {
     return;
   }
 
-  fetch('http://localhost:3000/api/admin-verify-code', {
+  fetch('https://medapp-to7o.onrender.com/api/admin-verify-code', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code, tempToken })

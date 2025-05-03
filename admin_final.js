@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://medapp-to7o.onrender.com";
 
 document.addEventListener('DOMContentLoaded', () => {
   showHome();
@@ -252,7 +252,7 @@ function addCurator() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ fio, login, password, email, group_name: group })
   })
-    .then(res => res.json()) // 👈 УБРАЛ .ok
+    .then(res => res.json()) 
     .then(data => {
       alert(data.message || 'Куратор добавлен');
       loadCurators();
