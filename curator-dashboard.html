@@ -66,61 +66,90 @@
   </div>
 
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const group = localStorage.getItem('curatorGroup');
-    const groupElement = document.getElementById('curatorGroupInfo');
+    document.addEventListener('DOMContentLoaded', () => {
+      const group = localStorage.getItem('curatorGroup');
+      const groupElement = document.getElementById('curatorGroupInfo');
+      if (group && groupElement) groupElement.textContent = `Ваша группа: ${group}`;
   
-    if (group && groupElement) {
-      groupElement.textContent = `Ваша группа: ${group}`;
-    }
-  });
-
-  document.getElementById('changePasswordBtn').addEventListener('click', () => {
-  const content = document.getElementById('dynamicContent');
-  content.innerHTML = `
-    <h3>Смена пароля</h3>
-    <input type="password" id="oldPassword" placeholder="Старый пароль" />
-    <input type="password" id="newPassword" placeholder="Новый пароль" />
-    <div id="passwordError" style="color:red; margin-bottom:0.5rem;"></div>
-    <button id="submitPasswordChange">Изменить пароль</button>
-  `;
-
-  document.getElementById('submitPasswordChange').addEventListener('click', () => {
-    const oldPassword = document.getElementById('oldPassword').value.trim();
-    const newPassword = document.getElementById('newPassword').value.trim();
-    const role = localStorage.getItem('role');
-    const id = localStorage.getItem(`${role}Id`);
-    const errorBlock = document.getElementById('passwordError');
-
-    if (!oldPassword || !newPassword) {
-      errorBlock.textContent = 'Заполните все поля';
-      return;
-    }
-
-    fetch('https://medapp-to7o.onrender.com/api/change-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role, id, oldPassword, newPassword })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.message.includes("Пароль должен")) {
-          errorBlock.textContent = data.message;
-        } else {
-          errorBlock.textContent = '';
-          alert(data.message);
-          document.getElementById('oldPassword').value = '';
-          document.getElementById('newPassword').value = '';
-        }
-      })
-      .catch(err => {
-        console.error('Ошибка:', err);
-        errorBlock.textContent = 'Ошибка при смене пароля';
+      document.getElementById('changePasswordBtn').addEventListener('click', () => {
+        document.getElementById('passwordModal').style.display = 'flex';
       });
-  });
-});
-  </script>
+  
+      document.getElementById('closePasswordModal').addEventListener('click', () => {
+        document.getElementById('passwordModal').style.display = 'none';
+      });
+  
+      document.getElementById('submitPasswordChange').addEventListener('click', () => {
+        const oldPassword = document.getElementById('oldPassword').value.trim();
+        const newPassword = document.getElementById('newPassword').value.trim();
+        const role = localStorage.getItem('role');
+        const id = localStorage.getItem(`${role}Id`);
+        const errorBlock = document.getElementById('passwordError');
+  
+        if (!oldPassword || !newPassword) {
+          errorBlock.textContent = 'Заполните все поля';
+          return;
+        }
+  
+        fetch('https://medapp-to7o.onrender.com/api/change-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role, id, oldPassword, newPassword })
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.message.includes("Пароль должен")) {
+              errorBlock.textContent = data.message;
+            } else {
+              alert(data.message);
+              document.getElementById('passwordModal').style.display = 'none';
+            }
+          })
+          .catch(() => {
+            errorBlock.textContent = 'Ошибка при смене пароля';
+          });
+      });
+    });
+  </script>  
 
   <script src="curator-dashboard.js"></script>
+  
+  <div id="passwordModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" id="closePasswordModal">&times;</span>
+      <h3>Смена пароля</h3>
+      <input type="password" id="oldPassword" placeholder="Старый пароль" />
+      <input type="password" id="newPassword" placeholder="Новый пароль" />
+      <div id="passwordError" style="color:red; margin: 0.5rem 0;"></div>
+      <button id="submitPasswordChange">Изменить пароль</button>
+    </div>
+  </div>
+  
+  <style>
+    .modal {
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .close {
+      float: right;
+      font-size: 24px;
+      cursor: pointer;
+    }
+  </style>
+  
 </body>
 </html>
