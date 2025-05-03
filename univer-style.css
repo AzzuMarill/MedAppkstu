@@ -424,6 +424,21 @@ body {
 }
 
 @media (max-width: 768px) {
+  .header-menu .menu {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-menu .menu li a {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .header-menu .menu li:last-child a {
+    border-bottom: none;
+  }
+  
   .main-content {
     flex-direction: column;
     padding: 0 10px;
