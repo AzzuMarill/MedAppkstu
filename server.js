@@ -15,7 +15,23 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const TELEGRAM_BOT_TOKEN = '8195401830:AAHOJLrlYdzMdIzIRvSBObnvpicId-nFjn8';
-const TELEGRAM_CHAT_ID = '808524947'; // ← вы указали его
+const TELEGRAM_CHAT_ID = '808524947'; 
+
+// Раздача статических файлов
+app.use(express.static(path.join(__dirname)));
+
+// Подключение базы данных
+const db = new sqlite3.Database('./studentdb.sqlite', (err) => {
+  if (err) {
+    console.error('Ошибка подключения к базе данных:', err.message);
+  } else {
+    console.log('База данных открыта');
+  }
+});
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'home.html'));
+});
 
 app.post('/api/admin-login', (req, res) => {
   const { login, password } = req.body;
@@ -54,7 +70,6 @@ app.post('/api/admin-verify-code', (req, res) => {
   res.json({ message: 'Код подтверждён' });
 });
 
-
 // Загрузка файлов (освобождение)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
@@ -62,14 +77,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Подключение к базе данных
-const db = new sqlite3.Database('./studentdb.sqlite', err => {
-  if (err) console.error('Ошибка при открытии базы данных:', err.message);
-  else console.log('База данных открыта');
-});
-
 // Таблицы
-
 // 1. Студенты
 db.run(`CREATE TABLE IF NOT EXISTS medical_data (
   student_id INTEGER PRIMARY KEY,
