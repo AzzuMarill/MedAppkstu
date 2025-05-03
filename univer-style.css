@@ -424,47 +424,52 @@ body {
 }
 
 @media (max-width: 768px) {
-  body {
-    font-size: 16px;
-    padding: 10px;
-  }
-
-  header, nav, .main-content, .card, .box {
-    width: 100%;
-    padding: 10px;
-    box-sizing: border-box;
-  }
-
-  .header-menu ul {
+  .main-content {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    padding: 0 10px;
   }
 
-  .header-menu ul li {
-    display: block;
+  .left-sidebar {
     width: 100%;
+    margin: 0 0 1rem 0;
+    border: none;
+    border-bottom: 1px solid #ccc;
   }
 
-  .form-section, .info-box, .student-list, .news-box {
-    margin-bottom: 20px;
-    padding: 10px;
+  .center-content {
+    width: 100%;
+    padding: 0;
   }
 
-  input[type="text"],
-  input[type="password"],
+  input,
+  select,
+  textarea,
   button {
     width: 100%;
+    box-sizing: border-box;
     font-size: 16px;
   }
 
-  table {
-    width: 100%;
-    font-size: 14px;
+  .btn-submit {
+    padding: 10px;
+    font-size: 16px;
+  }
+
+  .header-title {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .header-logo {
+    max-height: 50px;
+    display: block;
+    margin: 0 auto;
   }
 
   .footer {
+    font-size: 0.9rem;
     text-align: center;
-    font-size: 14px;
+    padding: 10px;
   }
 }
+
