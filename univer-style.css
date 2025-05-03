@@ -424,21 +424,27 @@ body {
 }
 
 @media (max-width: 768px) {
+  .header-menu {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
   .header-menu .menu {
-    flex-direction: column;
-    align-items: flex-start;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  .header-menu .menu li {
+    display: inline-block;
   }
 
   .header-menu .menu li a {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #ccc;
+    display: inline-block;
+    padding: 10px;
+    font-size: 16px;
   }
 
-  .header-menu .menu li:last-child a {
-    border-bottom: none;
-  }
-  
   .main-content {
     flex-direction: column;
     padding: 0 10px;
