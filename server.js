@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const app = express();
@@ -30,7 +29,7 @@ const db = new sqlite3.Database('./studentdb.sqlite', (err) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'home.html'));
+  res.sendFile(path.join(__dirname, 'login.html'));
 });
 
 app.post('/api/admin-login', (req, res) => {
