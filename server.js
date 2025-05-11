@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const TELEGRAM_BOT_TOKEN = '8195401830:AAHOJLrlYdzMdIzIRvSBObnvpicId-nFjn8';
-const TELEGRAM_CHAT_ID = '1096923731'; 
+const TELEGRAM_CHAT_ID = '1164239455'; 
 
 // Раздача статических файлов
 app.use(express.static(path.join(__dirname)));
