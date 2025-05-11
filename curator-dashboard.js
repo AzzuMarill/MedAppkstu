@@ -39,8 +39,7 @@ data.forEach(student => {
     downloadLink.textContent = 'Скачать снимок';
     downloadLink.href = `https://medapp-to7o.onrender.com${student.image_path}`;
     
-    // Чистим имя от лишних символов
-    const cleanName = student.fio.replace(/\s+/g, '_').replace(/[^\w\d_]/g, '');
+    const cleanName = student.fio.replace(/\s+/g, '_').replace(/[^\w\dа-яА-ЯёЁ_]/g, '');
     downloadLink.download = `${cleanName}_fluorography.jpg`;
 
     downloadLink.style.display = 'inline-block';
