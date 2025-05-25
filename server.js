@@ -907,6 +907,24 @@ app.get('/', (req, res) => {
     res.send(data);
   });
 });
+// Поиск студентов по ФИО, у которых нет анкеты в medical_data
+app.get('/api/search-students', (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) return res.json([]);
+  db.all(
+    `SELECT id, fio 
+     FROM students 
+     WHERE fio LIKE ? 
+       AND id NOT IN (SELECT student_id FROM medical_data)
+     LIMIT 10`,
+    [`%${q}%`],
+    (err, rows) => {
+      if (err) return res.status(500).json({ message: 'Ошибка поиска студентов' });
+      res.json(rows);
+    }
+  );
+});
+
 
 // Запуск сервера
 const PORT = 3000;

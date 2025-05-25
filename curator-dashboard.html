@@ -56,6 +56,9 @@
       <section class="center-content">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2 id="studentsTitle" style="margin: 0;">Студенты вашей группы</h2>
+            <button id="openAssignModal" class="btn-submit" style="margin-left:1rem;">
+              Добавить студента
+            </button>
             <span id="curatorGroupInfo" style="font-size: 1rem; color: #333;"></span>
           </div>  
           <section id="notifications" style="display:none; margin-bottom:1.5rem;">
@@ -194,6 +197,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   });
 });
+loadStudentList();
+showStudentsView();
+
 </script>
 
   <script src="curator-dashboard.js"></script>
@@ -250,8 +256,63 @@ document.addEventListener('DOMContentLoaded', () => {
     background-color: #f9f9f9;
     font-weight: bold;
   }
-
+  .suggestions-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .suggestions-list li {
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+  .suggestions-list li:hover {
+    background: #f0f0f0;
+  }
+  .modal {
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    position: relative;
+  }
+  .modal-content .close {
+    position: absolute;
+    top: 0.5rem; right: 1rem;
+    font-size: 1.5rem; cursor: pointer;
+  }
   </style>
-  
+  <!-- МОДАЛЬНОЕ ОКНО добавления студента -->
+<div id="assignModal" class="modal" style="display:none;">
+  <div class="modal-content" style="max-width:500px; width:90%;">
+    <span class="close" id="closeAssignModal">&times;</span>
+    <h3>Добавить студента в вашу группу</h3>
+
+    <div class="form-group" style="position:relative;">
+      <label for="assignSearch">ФИО студента</label>
+      <input
+        type="text"
+        id="assignSearch"
+        placeholder="Начните вводить ФИО..."
+        autocomplete="off"
+      />
+      <ul id="assignSuggestions" class="suggestions-list" style="position:absolute; top:100%; left:0; right:0; z-index:1000;"></ul>
+    </div>
+
+    <div id="assignError" style="color:red; margin:0.5rem 0;"></div>
+    <button id="assignConfirmBtn" class="btn-submit">Добавить</button>
+  </div>
+</div>
+
 </body>
 </html>
