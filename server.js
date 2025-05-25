@@ -695,13 +695,9 @@ app.get('/api/curator/students/:groupName', (req, res) => {
   const group = req.params.groupName;
 
   const sql = `
-    SELECT 
-    s.id, 
-    s.fio, 
-    xi.image_path AS imagePath,
-    xi.expiry_date AS expiryDate
+    SELECT s.id, s.fio, xi.image_path AS imageUrl, xi.expiry_date AS expiryDate
     FROM students s
-    LEFT JOIN medical_data md ON s.id = md.student_id
+    JOIN medical_data md ON s.id = md.student_id
     LEFT JOIN xray_images xi ON s.id = xi.student_id
     WHERE md.occupation = ?
   `;

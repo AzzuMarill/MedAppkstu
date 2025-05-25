@@ -173,102 +173,114 @@
     });
 
     // === ФЛЮОРОГРАФИЯ ===
-    document.getElementById('showXrayBtn').addEventListener('click', (e) => {
-  e.preventDefault();
-  document.getElementById('welcomeBlock').style.display = 'none';
-  const content = document.getElementById('dynamicContent');
+  document.getElementById('showXrayBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('welcomeBlock').style.display = 'none';
+    const content = document.getElementById('dynamicContent');
 
-  // 1) Рисуем форму с полем для срока годности
-  content.innerHTML = `
-    <h3>Снимок флюорографии</h3>
-    <div style="margin-bottom: 1rem;">
-      <label style="display:block; margin-bottom:0.5rem;">
-        Срок годности:
-        <input type="date" id="expiryDate" />
-      </label>
-      <input type="file" id="xrayUpload" accept="image/*" />
-      <button id="uploadBtn">Загрузить</button>
-    </div>
-    <div id="xrayPreview">Загрузка...</div>
-  `;
+    content.innerHTML = `
+      <h3>Снимок флюорографии</h3>
+      <div style="margin-bottom: 1rem;">
+        <label style="display:block; margin-bottom:0.5rem;">
+          Срок годности:
+          <input type="date" id="expiryDate" />
+        </label>
+        <input type="file" id="xrayUpload" accept="image/*" />
+        <button id="uploadBtn">Загрузить</button>
+      </div>
+      <div id="xrayPreview">Загрузка...</div>
+    `;
 
-  // 2) Сразу подгружаем уже сохранённый снимок (и дату, если нужно)
-  loadXray();
+    // После отрисовки — подгружаем данные
+    loadXray();
 
-  // 3) Перехватываем клик по кнопке и отправляем вместе с expiryDate
-  document.getElementById('uploadBtn').addEventListener('click', () => {
-    const file   = document.getElementById('xrayUpload').files[0];
-    const expiry = document.getElementById('expiryDate').value;
+    // Обработчик загрузки файла + срока годности
+    document.getElementById('uploadBtn').addEventListener('click', () => {
+      const file   = document.getElementById('xrayUpload').files[0];
+      const expiry = document.getElementById('expiryDate').value;
 
-    if (!file) {
-      return alert("Выберите файл для загрузки");
-    }
-    if (!expiry) {
-      return alert("Укажите срок годности");
-    }
+      if (!file)   return alert("Выберите файл для загрузки");
+      if (!expiry) return alert("Укажите срок годности");
 
-    const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
-    const formData  = new FormData();
-    formData.append('image',      file);
-    formData.append('studentId',  studentId);
-    formData.append('expiryDate', expiry);
+      const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
+      const formData  = new FormData();
+      formData.append('image',      file);
+      formData.append('studentId',  studentId);
+      formData.append('expiryDate', expiry);
 
-    fetch('https://medapp-to7o.onrender.com/api/xray-upload', {
-      method: 'POST',
-      body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.message || 'Загружено');
-      loadXray();  // обновляем превью
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Ошибка при загрузке снимка');
+      fetch('https://medapp-to7o.onrender.com/api/xray-upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message || 'Загружено');
+        loadXray();
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Ошибка при загрузке снимка');
+      });
     });
   });
-});
 
-    function loadXray() {
-      const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
-      fetch(`https://medapp-to7o.onrender.com/api/xray/${studentId}`)
-        .then(res => res.json())
-        .then(data => {
-          const preview = document.getElementById('xrayPreview');
-          if (!data || !data.imageUrl) {
-            preview.innerHTML = "<p>Снимок не загружен.</p>";
-            return;
-          }
-          preview.innerHTML = `
-            <p>Загруженный снимок:</p>
-            <img src="https://medapp-to7o.onrender.com${data.imageUrl}" style="max-width: 300px;" />
-            <br><br>
-            <a href="https://medapp-to7o.onrender.com${data.imageUrl}" download>Скачать</a> |
-            <button onclick="deleteXray()">Удалить</button>
-          `;
-        })
-        .catch(() => {
-          document.getElementById('xrayPreview').innerHTML = "<p>Ошибка при загрузке снимка.</p>";
-        });
-    }
-
-    function deleteXray() {
-      if (!confirm("Удалить снимок?")) return;
-      const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
-      fetch(`https://medapp-to7o.onrender.com/api/xray/${studentId}`, {
-        method: 'DELETE'
+  function loadXray() {
+    const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
+    fetch(`https://medapp-to7o.onrender.com/api/xray/${studentId}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Нет снимка');
+        return res.json();
       })
-        .then(res => res.json())
-        .then(data => {
-          alert(data.message || 'Удалено');
-          document.getElementById('xrayPreview').innerHTML = "<p>Снимок удалён.</p>";
-        })
-        .catch(err => {
-          console.error(err);
-          alert("Ошибка при удалении");
-        });
-    }
-  
+      .then(data => {
+        const preview = document.getElementById('xrayPreview');
+
+        // Если ничего нет — пишем сообщение
+        if (!data.imageUrl) {
+          preview.innerHTML = "<p>Снимок не загружен.</p>";
+          return;
+        }
+
+        // 1) поставим дату в поле
+        const expiryInput = document.getElementById('expiryDate');
+        if (expiryInput) expiryInput.value = data.expiryDate || '';
+
+        // 2) определим, истёк ли срок
+        const expiryDateObj = new Date(data.expiryDate);
+        const isExpired     = expiryDateObj < new Date();
+        const expiryText    = expiryDateObj.toLocaleDateString('ru-RU');
+
+        // 3) отображаем картинку + срок годности
+        preview.innerHTML = `
+          <p>
+            <strong>Срок годности:</strong>
+            <span style="color: ${isExpired ? 'red' : 'inherit'}">
+              ${expiryText}
+            </span>
+          </p>
+          <p>Загруженный снимок:</p>
+          <img src="https://medapp-to7o.onrender.com${data.imageUrl}" style="max-width: 300px;" />
+          <br><br>
+          <a href="https://medapp-to7o.onrender.com${data.imageUrl}" download>Скачать</a> |
+          <button onclick="deleteXray()">Удалить</button>
+        `;
+      })
+      .catch(() => {
+        document.getElementById('xrayPreview').innerHTML = "<p>Снимок не загружен.</p>";
+      });
+  }
+
+  function deleteXray() {
+    if (!confirm("Удалить снимок?")) return;
+    const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
+    fetch(`https://medapp-to7o.onrender.com/api/xray/${studentId}`, { method: 'DELETE' })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message || 'Удалено');
+        document.getElementById('xrayPreview').innerHTML = "<p>Снимок удалён.</p>";
+      })
+      .catch(() => alert("Ошибка при удалении"));
+  }
+
 function setupMedicalFormSubmit() {
   const form = document.querySelector('.big-form');
   if (!form) return;
