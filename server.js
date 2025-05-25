@@ -927,12 +927,15 @@ app.get('/', (req, res) => {
 app.get('/api/search-students', (req, res) => {
   const q = (req.query.q || '').trim();
   if (!q) return res.json([]);
+
   db.all(
-    `SELECT id, fio 
-     FROM students 
-     WHERE fio LIKE ? COLLATE NOCASE
-       AND id NOT IN (SELECT student_id FROM medical_data)
-     LIMIT 10`,
+    `SELECT s.id, s.fio
+       FROM students s
+  LEFT JOIN medical_data md
+         ON s.id = md.student_id
+      WHERE s.fio LIKE ? COLLATE NOCASE
+        AND (md.student_id IS NULL OR md.occupation IS NULL)
+      LIMIT 10`,
     [`%${q}%`],
     (err, rows) => {
       if (err) return res.status(500).json({ message: 'Ошибка поиска студентов' });
@@ -940,6 +943,7 @@ app.get('/api/search-students', (req, res) => {
     }
   );
 });
+
 // Удалить студента из группы куратора
 app.post('/api/unassign-student', express.json(), (req, res) => {
   const { curatorId, studentId } = req.body;
