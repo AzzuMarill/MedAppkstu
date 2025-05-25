@@ -76,12 +76,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // Элементы для переключения вида
+  // контейнеры для переключения вида
   const studentListEl   = document.getElementById('studentList');
   const notificationsEl = document.getElementById('notifications');
   const groupElement    = document.getElementById('curatorGroupInfo');
 
-  // Загрузка и рендер уведомлений
+  // 1) загрузка и рендер уведомлений (без счётчика)
   function loadNotifications() {
     const curatorId = localStorage.getItem('userId');
     fetch(`https://medapp-to7o.onrender.com/api/notifications/${curatorId}`)
@@ -89,9 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(data => {
         const ul = document.getElementById('notificationList');
         ul.innerHTML = '';
-        // бейдж с кол-вом непрочитанных
-        const unread = data.filter(n => n.is_read === 0).length;
-        notifCountEl.textContent = unread;
         if (!data.length) {
           ul.innerHTML = '<li>Нет новых уведомлений.</li>';
           return;
@@ -99,11 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
         data.forEach(n => {
           const li = document.createElement('li');
           li.textContent = `${new Date(n.created_at).toLocaleString()}: ${n.message}`;
-          if (n.is_read === 0) li.style.fontWeight = 'bold';
-          // при клике помечаем как прочитанное
+          if (n.is_read === 0) li.classList.add('unread');
           li.addEventListener('click', () => {
-            fetch(`https://medapp-to7o.onrender.com/api/notifications/${n.id}/read`, { method: 'POST' })
-              .then(() => li.style.fontWeight = 'normal');
+            fetch(`/api/notifications/${n.id}/read`, { method: 'POST' })
+              .then(() => li.classList.remove('unread'));
           });
           ul.appendChild(li);
         });
@@ -111,11 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(err => {
         console.error('Ошибка загрузки уведомлений:', err);
         document.getElementById('notificationList').innerHTML = '<li>Ошибка загрузки.</li>';
-        notifCountEl.textContent = '0';
       });
   }
 
-  // Переключение между списком студентов и уведомлениями
+  // 2) функции переключения между списком студентов и уведомлениями
   function showStudentsView() {
     notificationsEl.style.display = 'none';
     studentListEl.style.display = 'block';
@@ -126,20 +121,20 @@ document.addEventListener('DOMContentLoaded', () => {
     loadNotifications();
   }
 
-  // Привязываем кнопки в шапке
+  // 3) привязка кнопок в шапке
   document.getElementById('showStudents')
     .addEventListener('click', e => { e.preventDefault(); showStudentsView(); });
   document.getElementById('showNotifications')
     .addEventListener('click', e => { e.preventDefault(); showNotificationsView(); });
 
-  // Показываем студенты по-умолчанию
+  // показываем студентов при первой загрузке
   showStudentsView();
 
-  // Загрузка информации о группе
+  // 4) подстановка названия группы
   const group = localStorage.getItem('curatorGroup');
   if (group && groupElement) groupElement.textContent = `Ваша группа: ${group}`;
 
-  // Открытие/закрытие модального окна смены пароля
+  // 5) модалка смены пароля
   document.getElementById('changePasswordBtn').addEventListener('click', () => {
     document.getElementById('passwordModal').style.display = 'flex';
   });
@@ -147,13 +142,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('passwordModal').style.display = 'none';
   });
 
-  // Обработка смены пароля
+  // 6) приём данных из модалки и вызов API смены пароля
   document.getElementById('submitPasswordChange').addEventListener('click', () => {
     const oldPassword = document.getElementById('oldPassword').value.trim();
     const newPassword = document.getElementById('newPassword').value.trim();
-    const role = localStorage.getItem('role');
-    const id   = localStorage.getItem(`${role}Id`);
-    const errorBlock = document.getElementById('passwordError');
+    const role        = localStorage.getItem('role');
+    const id          = localStorage.getItem(`${role}Id`);
+    const errorBlock  = document.getElementById('passwordError');
 
     if (!oldPassword || !newPassword) {
       errorBlock.textContent = 'Заполните все поля';
@@ -180,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
-
 
   <script src="curator-dashboard.js"></script>
   
