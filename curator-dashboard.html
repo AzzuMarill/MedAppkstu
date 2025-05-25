@@ -41,9 +41,14 @@
             <li><a href="https://egov.kz/cms/kk" target="_blank">egov</a></li>
             </ul>
             <ul class="menu exit">
-              <li><a href="#" id="changePasswordBtn">Сменить пароль</a></li>
-              <li><a href="login.html">Выход</a></li>
-            </ul>            
+            <li><a href="#" id="changePasswordBtn">Сменить пароль</a></li>
+            <!-- КНОПКИ ДЛЯ ПЕРЕКЛЮЧЕНИЯ ВИДА -->
+            <li><a href="#" id="showStudents">Студенты</a></li>
+            <li><a href="#" id="showNotifications">
+              Уведомления <span id="notifCount" class="badge">0</span>
+            </a></li>
+            <li><a href="login.html">Выход</a></li>
+          </ul>          
         </nav>
         
     </header>
@@ -55,7 +60,7 @@
             <h2 style="margin: 0;">Студенты вашей группы</h2>
             <span id="curatorGroupInfo" style="font-size: 1rem; color: #333;"></span>
           </div>  
-        <section id="notifications" style="margin-bottom:1.5rem;">
+          <section id="notifications" style="display:none; margin-bottom:1.5rem;">
           <h2>Уведомления</h2>
           <ul id="notificationList" style="list-style: none; padding-left:0;">
             <li>Загрузка...</li>
@@ -71,79 +76,114 @@
     </footer>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // --- Загрузка уведомлений ---
-      const curatorId = localStorage.getItem('userId');
-      fetch(`https://medapp-to7o.onrender.com/api/notifications/${curatorId}`)
-        .then(res => res.json())
-        .then(data => {
-          const ul = document.getElementById('notificationList');
-          ul.innerHTML = '';
-          if (!data || data.length === 0) {
-            ul.innerHTML = '<li>Нет новых уведомлений.</li>';
-            return;
-          }
-          data.forEach(n => {
-            const li = document.createElement('li');
-            li.textContent = `${new Date(n.created_at).toLocaleString()}: ${n.message}`;
-            if (n.is_read === 0) li.style.fontWeight = 'bold';
-            // при клике пометить прочитанным
-            li.onclick = () => {
-              fetch(`https://medapp-to7o.onrender.com/api/notifications/${n.id}/read`, { method: 'POST' })
-                .then(() => { li.style.fontWeight = 'normal'; });
-            };
-            ul.appendChild(li);
-          });
-        })
-        .catch(err => {
-          console.error('Ошибка загрузки уведомлений:', err);
-          document.getElementById('notificationList').innerHTML = '<li>Ошибка загрузки.</li>';
-        });
-      const group = localStorage.getItem('curatorGroup');
-      const groupElement = document.getElementById('curatorGroupInfo');
-      if (group && groupElement) groupElement.textContent = `Ваша группа: ${group}`;
-  
-      document.getElementById('changePasswordBtn').addEventListener('click', () => {
-        document.getElementById('passwordModal').style.display = 'flex';
-      });
-  
-      document.getElementById('closePasswordModal').addEventListener('click', () => {
-        document.getElementById('passwordModal').style.display = 'none';
-      });
-  
-      document.getElementById('submitPasswordChange').addEventListener('click', () => {
-        const oldPassword = document.getElementById('oldPassword').value.trim();
-        const newPassword = document.getElementById('newPassword').value.trim();
-        const role = localStorage.getItem('role');
-        const id = localStorage.getItem(`${role}Id`);
-        const errorBlock = document.getElementById('passwordError');
-  
-        if (!oldPassword || !newPassword) {
-          errorBlock.textContent = 'Заполните все поля';
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Элементы для переключения вида
+  const studentListEl   = document.getElementById('studentList');
+  const notificationsEl = document.getElementById('notifications');
+  const notifCountEl    = document.getElementById('notifCount');
+  const groupElement    = document.getElementById('curatorGroupInfo');
+
+  // Загрузка и рендер уведомлений
+  function loadNotifications() {
+    const curatorId = localStorage.getItem('userId');
+    fetch(`https://medapp-to7o.onrender.com/api/notifications/${curatorId}`)
+      .then(res => res.json())
+      .then(data => {
+        const ul = document.getElementById('notificationList');
+        ul.innerHTML = '';
+        // бейдж с кол-вом непрочитанных
+        const unread = data.filter(n => n.is_read === 0).length;
+        notifCountEl.textContent = unread;
+        if (!data.length) {
+          ul.innerHTML = '<li>Нет новых уведомлений.</li>';
           return;
         }
-  
-        fetch('https://medapp-to7o.onrender.com/api/change-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ role, id, oldPassword, newPassword })
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.message.includes("Пароль должен")) {
-              errorBlock.textContent = data.message;
-            } else {
-              alert(data.message);
-              document.getElementById('passwordModal').style.display = 'none';
-            }
-          })
-          .catch(() => {
-            errorBlock.textContent = 'Ошибка при смене пароля';
+        data.forEach(n => {
+          const li = document.createElement('li');
+          li.textContent = `${new Date(n.created_at).toLocaleString()}: ${n.message}`;
+          if (n.is_read === 0) li.style.fontWeight = 'bold';
+          // при клике помечаем как прочитанное
+          li.addEventListener('click', () => {
+            fetch(`https://medapp-to7o.onrender.com/api/notifications/${n.id}/read`, { method: 'POST' })
+              .then(() => li.style.fontWeight = 'normal');
           });
+          ul.appendChild(li);
+        });
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки уведомлений:', err);
+        document.getElementById('notificationList').innerHTML = '<li>Ошибка загрузки.</li>';
+        notifCountEl.textContent = '0';
       });
-    });
-  </script>  
+  }
+
+  // Переключение между списком студентов и уведомлениями
+  function showStudentsView() {
+    notificationsEl.style.display = 'none';
+    studentListEl.style.display = 'block';
+  }
+  function showNotificationsView() {
+    studentListEl.style.display = 'none';
+    notificationsEl.style.display = 'block';
+    loadNotifications();
+  }
+
+  // Привязываем кнопки в шапке
+  document.getElementById('showStudents')
+    .addEventListener('click', e => { e.preventDefault(); showStudentsView(); });
+  document.getElementById('showNotifications')
+    .addEventListener('click', e => { e.preventDefault(); showNotificationsView(); });
+
+  // Показываем студенты по-умолчанию
+  showStudentsView();
+
+  // Загрузка информации о группе
+  const group = localStorage.getItem('curatorGroup');
+  if (group && groupElement) groupElement.textContent = `Ваша группа: ${group}`;
+
+  // Открытие/закрытие модального окна смены пароля
+  document.getElementById('changePasswordBtn').addEventListener('click', () => {
+    document.getElementById('passwordModal').style.display = 'flex';
+  });
+  document.getElementById('closePasswordModal').addEventListener('click', () => {
+    document.getElementById('passwordModal').style.display = 'none';
+  });
+
+  // Обработка смены пароля
+  document.getElementById('submitPasswordChange').addEventListener('click', () => {
+    const oldPassword = document.getElementById('oldPassword').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const role = localStorage.getItem('role');
+    const id   = localStorage.getItem(`${role}Id`);
+    const errorBlock = document.getElementById('passwordError');
+
+    if (!oldPassword || !newPassword) {
+      errorBlock.textContent = 'Заполните все поля';
+      return;
+    }
+
+    fetch('https://medapp-to7o.onrender.com/api/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role, id, oldPassword, newPassword })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message.includes('Пароль должен')) {
+          errorBlock.textContent = data.message;
+        } else {
+          alert(data.message);
+          document.getElementById('passwordModal').style.display = 'none';
+        }
+      })
+      .catch(() => {
+        errorBlock.textContent = 'Ошибка при смене пароля';
+      });
+  });
+});
+</script>
+
 
   <script src="curator-dashboard.js"></script>
   

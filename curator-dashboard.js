@@ -62,3 +62,61 @@ data.forEach(student => {
     console.error('Ошибка при получении студентов:', err);
     document.getElementById('studentList').innerHTML = "<p>Ошибка загрузки списка студентов.</p>";
   });
+const studentListEl = document.getElementById('studentList');
+const notificationsEl = document.getElementById('notifications');
+
+function showStudentsView() {
+  notificationsEl.style.display = 'none';
+  studentListEl.style.display = 'block';
+}
+
+function showNotificationsView() {
+  studentListEl.style.display = 'none';
+  notificationsEl.style.display = 'block';
+  loadNotifications();  // подгрузить список уведомлений
+}
+
+function loadNotifications() {
+  const curatorId = localStorage.getItem('userId');
+  fetch(`/api/notifications/${curatorId}`)
+    .then(res => res.json())
+    .then(data => {
+      const ul = document.getElementById('notificationList');
+      const count = document.getElementById('notifCount');
+      ul.innerHTML = '';
+      const unread = data.filter(n => n.is_read === 0).length;
+      count.textContent = unread;
+      if (!data.length) {
+        ul.innerHTML = '<li>Нет новых уведомлений.</li>';
+        return;
+      }
+      data.forEach(n => {
+        const li = document.createElement('li');
+        li.textContent = `${new Date(n.created_at).toLocaleString()}: ${n.message}`;
+        if (n.is_read === 0) li.style.fontWeight = 'bold';
+        li.onclick = () => {
+          fetch(`/api/notifications/${n.id}/read`, { method: 'POST' })
+            .then(() => li.style.fontWeight = 'normal');
+        };
+        ul.appendChild(li);
+      });
+    })
+    .catch(() => {
+      document.getElementById('notificationList').innerHTML =
+        '<li class="text-danger">Ошибка загрузки.</li>';
+    });
+}
+document.getElementById('showStudents')
+  .addEventListener('click', e => {
+    e.preventDefault();
+    showStudentsView();
+  });
+
+document.getElementById('showNotifications')
+  .addEventListener('click', e => {
+    e.preventDefault();
+    showNotificationsView();
+  });
+
+// при первой загрузке показываем студентов
+showStudentsView();
