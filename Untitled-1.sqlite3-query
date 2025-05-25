@@ -1,0 +1,31 @@
+-- database: ./studentdb.sqlite
+
+SELECT * FROM students;
+
+BEGIN TRANSACTION;
+
+INSERT INTO students (fio, login, password, email) VALUES
+('Савронов Санджар Музаффарұлы',    'savronov.sandzhar',    'Qwerty1!', ''),
+('Құрбанәлі Мадияр Мақсатұлы',      'kurbanali.madiyar',    'Qwerty1!', ''),
+('Ергенов Азимбек Абайұлы',         'ergenov.azimbek',      'Qwerty1!', ''),
+('Жолдасілов Қуаныш Асхатұлы',      'zholdasilov.kuanysh',  'Qwerty1!', ''),
+('Жақсыгелді Шахнияз Арманұлы',     'zhaksigeldi.shahniyaz','Qwerty1!', ''),
+('Әрімбек Нұрсұлтан',               'arimbek.nursultan',    'Qwerty1!', ''),
+('Ержігіт Айдын Ержанқызы',         'erzhigit.aydin',       'Qwerty1!', ''),
+('Какенов Нурсултан Еркебуланович',  'kakenov.nursultan',    'Qwerty1!', ''),
+('Қалдыбек Шыңғысхан Асхатұлы',     'kaldybek.shygyskhan',  'Qwerty1!', ''),
+('Кутжанов Алим Русланович',        'kutzhanov.alim',       'Qwerty1!', ''),
+('Қапар Раушан Сағатбекқызы',       'kapar.raushan',        'Qwerty1!', ''),
+('Қияш Абу али Жеңісұлы',           'kiyash.abu',           'Qwerty1!', ''),
+('Ержанов Биржан Ержанович',        'erzhanov.birzhan',     'Qwerty1!', ''),
+('Назарбек Жұлдыз Назарбекқызы',    'nazarbek.zhuldyz',     'Qwerty1!', ''),
+('Иемберген Айбек Болатұлы',        'iembergen.aibek',      'Qwerty1!', ''),
+('Кандибекова Айнур Қанаатқизи',    'kandibekova.ainur',     'Qwerty1!', ''),
+('Жаңбыров Ерсұлтан Әсетұлы',       'zhambyrov.ersultan',   'Qwerty1!', ''),
+('Садулла Исатай Шамшырақұлы',       'sadulla.isatay',       'Qwerty1!', ''),
+('Күнтуған Диас Жұлдызханұлы',      'kuntugan.dias',        'Qwerty1!', ''),
+('Жумақулова Лаззат Есенғалиқызы',   'zhumagulova.lazzat',   'Qwerty1!', ''),
+('Ергалиева Мерей Арманқызы',       'ergalieva.merey',      'Qwerty1!', ''),
+('Шілмен Байкен Рысбекұлы',          'shilmen.bayken',       'Qwerty1!', '');
+
+COMMIT;
