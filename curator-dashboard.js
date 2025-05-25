@@ -120,3 +120,32 @@ document.getElementById('showNotifications')
 
 // при первой загрузке показываем студентов
 showStudentsView();
+
+// === Привязка формы добавления студента ===
+const assignForm = document.getElementById('assignForm');
+const assignMsg  = document.getElementById('assignMessage');
+
+assignForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const studentId = document.getElementById('assignStudentId').value.trim();
+  const curatorId = localStorage.getItem('userId');
+
+  fetch('/api/assign-student', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ curatorId, studentId })
+  })
+    .then(async res => {
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Ошибка');
+      assignMsg.style.color = 'green';
+      assignMsg.textContent = data.message;
+      // опционально: перезагрузить список студентов
+      loadStudentList?.();
+    })
+    .catch(err => {
+      console.error(err);
+      assignMsg.style.color = 'red';
+      assignMsg.textContent = err.message;
+    });
+});

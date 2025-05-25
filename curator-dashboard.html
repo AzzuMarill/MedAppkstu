@@ -63,6 +63,22 @@
             <ul id="notificationList" class="notifications-list">
             <li>Загрузка...</li>
           </ul>
+        </section>
+        <section id="assign-section" style="margin: 1.5rem 0;">
+          <h3>Добавить студента в группу</h3>
+          <form id="assignForm" style="display:flex; gap:0.5rem; align-items:flex-end;">
+            <div class="form-group" style="flex:1;">
+              <label for="assignStudentId">ID студента</label>
+              <input
+                type="text"
+                id="assignStudentId"
+                placeholder="Введите ID студента"
+                required
+              />
+            </div>
+            <button type="submit" class="btn-submit">Добавить</button>
+          </form>
+          <div id="assignMessage" style="margin-top:0.5rem; color: green;"></div>
         </section>        
         <div id="studentList"></div>
         <div id="dynamicContent"></div>

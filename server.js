@@ -819,6 +819,43 @@ app.post('/api/change-password', async (req, res) => {
     });
   });
 });
+// Добавить студента в группу куратора
+app.post('/api/assign-student', express.json(), (req, res) => {
+  const { curatorId, studentId } = req.body;
+  if (!curatorId || !studentId) {
+    return res.status(400).json({ message: 'Не указан curatorId или studentId' });
+  }
+  // Находим группу куратора
+  db.get(
+    'SELECT group_name FROM curators WHERE id = ?',
+    [curatorId],
+    (err, row) => {
+      if (err || !row) return res.status(400).json({ message: 'Куратор не найден' });
+      const group = row.group_name;
+      // Пробуем обновить существующую запись
+      db.run(
+        'UPDATE medical_data SET occupation = ? WHERE student_id = ?',
+        [group, studentId],
+        function(err) {
+          if (err) return res.status(500).json({ message: 'Ошибка при обновлении записи' });
+          if (this.changes === 0) {
+            // Если записи не было — создаём новую
+            db.run(
+              'INSERT INTO medical_data (student_id, occupation) VALUES (?, ?)',
+              [studentId, group],
+              err2 => {
+                if (err2) return res.status(500).json({ message: 'Ошибка при создании записи' });
+                res.json({ message: 'Студент добавлен в вашу группу' });
+              }
+            );
+          } else {
+            res.json({ message: 'Студент добавлен в вашу группу' });
+          }
+        }
+      );
+    }
+  );
+});
 
 app.put('/api/doctors/:id', async (req, res) => {
   const id = req.params.id;
