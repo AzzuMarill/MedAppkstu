@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <title>Кабинет куратора</title>
   <link rel="stylesheet" href="univer-style.css" />
-  <div id="accessDeniedMessage" style="display:none; padding: 10px; background: #ffcccc; color: #a00; font-weight: bold; text-align: center;">
-    Доступ только для кураторов. Перенаправление на страницу входа...
-  </div>
   
   <script>
     const role = localStorage.getItem('role');
@@ -24,6 +21,9 @@
   
 </head>
 <body>
+    <div id="accessDeniedMessage" style="display:none; padding: 10px; background: #ffcccc; color: #a00; font-weight: bold; text-align: center;">
+    Доступ только для кураторов. Перенаправление на страницу входа...
+  </div>
   <div class="page-wrapper">
     <header class="header">
         <div class="header-top improved-header">
@@ -76,6 +76,18 @@
       © 2025 Students medical app
     </footer>
   </div>
+  <!-- МОДАЛЬНОЕ ОКНО СМЕНЫ ПАРОЛЯ -->
+<div id="passwordModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" id="closePasswordModal">&times;</span>
+    <h3>Смена пароля</h3>
+    <input type="password" id="oldPassword" placeholder="Старый пароль" />
+    <input type="password" id="newPassword" placeholder="Новый пароль" />
+    <div id="passwordError" style="color:red; margin:0.5rem 0;"></div>
+    <button id="submitPasswordChange" class="btn-submit">Изменить пароль</button>
+  </div>
+</div>
+
   <!-- МОДАЛЬНОЕ ОКНО добавления студента -->
 <div id="assignModal" class="modal" style="display:none;">
   <div class="modal-content" style="max-width:500px; width:90%;">
