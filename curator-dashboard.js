@@ -1,40 +1,48 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // === Элементы страницы ===
-  const studentListEl   = document.getElementById('studentList');
-  const notificationsEl = document.getElementById('notifications');
-  const showStudentsBtn = document.getElementById('showStudents');
-  const showNotifsBtn   = document.getElementById('showNotifications');
-  const assignForm      = document.getElementById('assignForm');
-  const assignMsg       = document.getElementById('assignMessage');
+// curator-dashboard.js
 
-  // Модалка добавления
-  const openAssignModalBtn = document.getElementById('openAssignModal');
-  const assignModal        = document.getElementById('assignModal');
-  const closeAssignModal   = document.getElementById('closeAssignModal');
-  const searchInput        = document.getElementById('assignSearch');
-  const suggestionsList    = document.getElementById('assignSuggestions');
-  const assignError        = document.getElementById('assignError');
-  const assignConfirmBtn   = document.getElementById('assignConfirmBtn');
+document.addEventListener('DOMContentLoaded', () => {
+  // === DOM-элементы ===
+  const studentListEl       = document.getElementById('studentList');
+  const notificationsEl     = document.getElementById('notifications');
+  const studentsTitleEl     = document.getElementById('studentsTitle');
+  const groupEl             = document.getElementById('curatorGroupInfo');
+  const showStudentsBtn     = document.getElementById('showStudents');
+  const showNotifsBtn       = document.getElementById('showNotifications');
+  const changePwdBtn        = document.getElementById('changePasswordBtn');
+  const passwordModal       = document.getElementById('passwordModal');
+  const closePwdModalBtn    = document.getElementById('closePasswordModal');
+  const submitPwdChangeBtn  = document.getElementById('submitPasswordChange');
+  const oldPwdInput         = document.getElementById('oldPassword');
+  const newPwdInput         = document.getElementById('newPassword');
+  const pwdErrorBlock       = document.getElementById('passwordError');
+  const openAssignModalBtn  = document.getElementById('openAssignModal');
+  const assignModal         = document.getElementById('assignModal');
+  const closeAssignModalBtn = document.getElementById('closeAssignModal');
+  const searchInput         = document.getElementById('assignSearch');
+  const suggestionsList     = document.getElementById('assignSuggestions');
+  const assignErrorBlock    = document.getElementById('assignError');
+  const assignConfirmBtn    = document.getElementById('assignConfirmBtn');
 
   let selectedStudentId = null;
+  let searchDebounce;
 
-  // === 1. Загрузка и отображение списка студентов куратора ===
+  // === 1. Загрузка списка студентов куратора ===
   function loadStudentList() {
     const group = localStorage.getItem('curatorGroup');
     if (!group) {
-      alert("Вы не авторизованы как куратор");
-      window.location.href = "login.html";
+      alert('Вы не авторизованы как куратор');
+      window.location.href = 'login.html';
       return;
     }
-
+    groupEl.textContent = `Ваша группа: ${group}`;
     fetch(`https://medapp-to7o.onrender.com/api/curator/students/${encodeURIComponent(group)}`)
       .then(res => res.json())
       .then(data => {
-        if (!data || data.length === 0) {
-          studentListEl.innerHTML = "<p>Нет студентов в вашей группе.</p>";
+        studentListEl.innerHTML = '';
+        if (!data.length) {
+          studentListEl.innerHTML = '<p>Нет студентов в вашей группе.</p>';
           return;
         }
-        studentListEl.innerHTML = '';
         data.forEach(student => {
           const card = document.createElement('div');
           card.className = 'student-card';
@@ -42,12 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
           card.style.padding = '1rem';
           card.style.marginBottom = '1rem';
 
-          // ФИО
           const fioP = document.createElement('p');
           fioP.innerHTML = `<strong>ФИО:</strong> ${student.fio}`;
           card.appendChild(fioP);
 
-          // Изображение и ссылка на скачивание
           if (student.image_path) {
             const img = document.createElement('img');
             img.src = `https://medapp-to7o.onrender.com${student.image_path}`;
@@ -59,10 +65,10 @@ document.addEventListener('DOMContentLoaded', () => {
             downloadLink.href           = `https://medapp-to7o.onrender.com${student.image_path}`;
             const cleanName             = student.fio.replace(/\s+/g, '_').replace(/[^\w\dа-яА-ЯёЁ_]/g, '');
             downloadLink.download       = `${cleanName}_fluorography.jpg`;
-            downloadLink.style.display       = 'inline-block';
-            downloadLink.style.marginTop     = '0.5rem';
-            downloadLink.style.color         = '#007BFF';
-            downloadLink.style.textDecoration= 'underline';
+            downloadLink.style.display        = 'inline-block';
+            downloadLink.style.marginTop      = '0.5rem';
+            downloadLink.style.color          = '#007BFF';
+            downloadLink.style.textDecoration = 'underline';
             card.appendChild(downloadLink);
           } else {
             const noImg = document.createElement('p');
@@ -75,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .catch(err => {
         console.error('Ошибка при получении студентов:', err);
-        studentListEl.innerHTML = "<p>Ошибка загрузки списка студентов.</p>";
+        studentListEl.innerHTML = '<p>Ошибка загрузки списка студентов.</p>';
       });
   }
 
@@ -104,63 +110,86 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .catch(err => {
         console.error('Ошибка загрузки уведомлений:', err);
-        document.getElementById('notificationList').innerHTML =
-          '<li class="text-danger">Ошибка загрузки.</li>';
+        document.getElementById('notificationList').innerHTML = '<li>Ошибка загрузки.</li>';
       });
   }
 
   // === 3. Переключение между видами ===
   showStudentsBtn.addEventListener('click', e => {
     e.preventDefault();
-    notificationsEl.style.display = 'none';
-    studentListEl.style.display   = 'block';
+    studentsTitleEl.style.display   = '';
+    notificationsEl.style.display   = 'none';
+    studentListEl.style.display     = 'block';
     loadStudentList();
   });
   showNotifsBtn.addEventListener('click', e => {
     e.preventDefault();
-    studentListEl.style.display   = 'none';
-    notificationsEl.style.display = 'block';
+    studentsTitleEl.style.display   = 'none';
+    studentListEl.style.display     = 'none';
+    notificationsEl.style.display   = 'block';
     loadNotifications();
   });
 
-  // === Инициализация при загрузке страницы ===
-  notificationsEl.style.display = 'none';
-  studentListEl.style.display   = 'block';
-  loadStudentList();
+  // === 4. Смена пароля ===
+  changePwdBtn.addEventListener('click', () => passwordModal.style.display = 'flex');
+  closePwdModalBtn.addEventListener('click', () => passwordModal.style.display = 'none');
+  submitPwdChangeBtn.addEventListener('click', () => {
+    const oldPwd = oldPwdInput.value.trim();
+    const newPwd = newPwdInput.value.trim();
+    pwdErrorBlock.textContent = '';
+    if (!oldPwd || !newPwd) {
+      pwdErrorBlock.textContent = 'Заполните все поля';
+      return;
+    }
+    const role = localStorage.getItem('role');
+    const id   = localStorage.getItem(`${role}Id`);
+    fetch('https://medapp-to7o.onrender.com/api/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role, id, oldPassword: oldPwd, newPassword: newPwd })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message.includes('Пароль должен')) {
+          pwdErrorBlock.textContent = data.message;
+        } else {
+          alert(data.message);
+          passwordModal.style.display = 'none';
+        }
+      })
+      .catch(() => { pwdErrorBlock.textContent = 'Ошибка при смене пароля'; });
+  });
 
-  // === 4. Модальное окно добавления студента ===
+  // === 5. Модалка добавления студента ===
   openAssignModalBtn.addEventListener('click', () => {
-    assignModal.style.display = 'flex';
-    searchInput.value = '';
-    suggestionsList.innerHTML = '';
-    assignError.textContent = '';
-    selectedStudentId = null;
+    assignModal.style.display     = 'flex';
+    searchInput.value             = '';
+    suggestionsList.innerHTML     = '';
+    assignErrorBlock.textContent  = '';
+    selectedStudentId             = null;
   });
-  closeAssignModal.addEventListener('click', () => {
-    assignModal.style.display = 'none';
-  });
+  closeAssignModalBtn.addEventListener('click', () => assignModal.style.display = 'none');
 
   // Поиск студентов по ФИО (дебаунс)
-  let searchTimeout;
   searchInput.addEventListener('input', () => {
-    clearTimeout(searchTimeout);
+    clearTimeout(searchDebounce);
     const q = searchInput.value.trim();
     suggestionsList.innerHTML = '';
-    selectedStudentId = null;
+    selectedStudentId         = null;
     if (!q) return;
-    searchTimeout = setTimeout(() => {
+    searchDebounce = setTimeout(() => {
       fetch(`/api/search-students?q=${encodeURIComponent(q)}`)
         .then(r => r.json())
         .then(list => {
           suggestionsList.innerHTML = '';
           list.forEach(student => {
             const li = document.createElement('li');
-            li.textContent = student.fio;
-            li.dataset.id  = student.id;
+            li.textContent      = student.fio;
+            li.dataset.id       = student.id;
             li.addEventListener('click', () => {
-              searchInput.value        = student.fio;
-              selectedStudentId        = student.id;
-              suggestionsList.innerHTML = '';
+              searchInput.value             = student.fio;
+              selectedStudentId             = student.id;
+              suggestionsList.innerHTML     = '';
             });
             suggestionsList.appendChild(li);
           });
@@ -171,8 +200,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Подтверждение добавления
   assignConfirmBtn.addEventListener('click', () => {
+    assignErrorBlock.textContent = '';
     if (!selectedStudentId) {
-      assignError.textContent = 'Пожалуйста, выберите студента из списка.';
+      assignErrorBlock.textContent = 'Пожалуйста, выберите студента из списка.';
       return;
     }
     const curatorId = localStorage.getItem('userId');
@@ -184,15 +214,19 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(async res => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Ошибка');
-        assignError.style.color   = 'green';
-        assignError.textContent   = data.message;
-        loadStudentList();        // обновляем список
+        assignErrorBlock.style.color  = 'green';
+        assignErrorBlock.textContent  = data.message;
+        loadStudentList();
         setTimeout(() => assignModal.style.display = 'none', 1000);
       })
       .catch(err => {
-        console.error(err);
-        assignError.style.color   = 'red';
-        assignError.textContent   = err.message;
+        assignErrorBlock.style.color  = 'red';
+        assignErrorBlock.textContent  = err.message;
       });
   });
+
+  // === 6. Инициализация ===
+  notificationsEl.style.display = 'none';
+  studentListEl.style.display   = 'block';
+  loadStudentList();
 });

@@ -66,23 +66,7 @@
             <ul id="notificationList" class="notifications-list">
             <li>Загрузка...</li>
           </ul>
-        </section>
-        <section id="assign-section" style="margin: 1.5rem 0;">
-          <h3>Добавить студента в группу</h3>
-          <form id="assignForm" style="display:flex; gap:0.5rem; align-items:flex-end;">
-            <div class="form-group" style="flex:1;">
-              <label for="assignStudentId">ID студента</label>
-              <input
-                type="text"
-                id="assignStudentId"
-                placeholder="Введите ID студента"
-                required
-              />
-            </div>
-            <button type="submit" class="btn-submit">Добавить</button>
-          </form>
-          <div id="assignMessage" style="margin-top:0.5rem; color: green;"></div>
-        </section>        
+        </section>     
         <div id="studentList"></div>
         <div id="dynamicContent"></div>
       </section>
@@ -92,128 +76,29 @@
       © 2025 Students medical app
     </footer>
   </div>
+  <!-- МОДАЛЬНОЕ ОКНО добавления студента -->
+<div id="assignModal" class="modal" style="display:none;">
+  <div class="modal-content" style="max-width:500px; width:90%;">
+    <span class="close" id="closeAssignModal">&times;</span>
+    <h3>Добавить студента в вашу группу</h3>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // контейнеры для переключения вида
-  const studentListEl   = document.getElementById('studentList');
-  const notificationsEl = document.getElementById('notifications');
-  const groupElement    = document.getElementById('curatorGroupInfo');
-  const studentsTitleEl = document.getElementById('studentsTitle');
-
-  // 1) загрузка и рендер уведомлений (без счётчика)
-  function loadNotifications() {
-    const curatorId = localStorage.getItem('userId');
-    fetch(`https://medapp-to7o.onrender.com/api/notifications/${curatorId}`)
-      .then(res => res.json())
-      .then(data => {
-        const ul = document.getElementById('notificationList');
-        ul.innerHTML = '';
-        if (!data.length) {
-          ul.innerHTML = '<li>Нет новых уведомлений.</li>';
-          return;
-        }
-        data.forEach(n => {
-          const li = document.createElement('li');
-          li.textContent = `${new Date(n.created_at).toLocaleString()}: ${n.message}`;
-          if (n.is_read === 0) li.classList.add('unread');
-          li.addEventListener('click', () => {
-            fetch(`/api/notifications/${n.id}/read`, { method: 'POST' })
-              .then(() => li.classList.remove('unread'));
-          });
-          ul.appendChild(li);
-        });
-      })
-      .catch(err => {
-        console.error('Ошибка загрузки уведомлений:', err);
-        document.getElementById('notificationList').innerHTML = '<li>Ошибка загрузки.</li>';
-      });
-  }
-
-    // 2) функции переключения между списком студентов и уведомлениями
-  function showStudentsView() {
-    studentsTitleEl.style.display   = '';        // показываем заголовок
-    notificationsEl.style.display   = 'none';
-    studentListEl.style.display     = 'block';
-  }
-  function showNotificationsView() {
-    studentsTitleEl.style.display   = 'none';    // скрываем заголовок
-    studentListEl.style.display     = 'none';
-    notificationsEl.style.display   = 'block';
-    loadNotifications();
-  }
-
-
-  // 3) привязка кнопок в шапке
-  document.getElementById('showStudents')
-    .addEventListener('click', e => { e.preventDefault(); showStudentsView(); });
-  document.getElementById('showNotifications')
-    .addEventListener('click', e => { e.preventDefault(); showNotificationsView(); });
-
-  // показываем студентов при первой загрузке
-  showStudentsView();
-
-  // 4) подстановка названия группы
-  const group = localStorage.getItem('curatorGroup');
-  if (group && groupElement) groupElement.textContent = `Ваша группа: ${group}`;
-
-  // 5) модалка смены пароля
-  document.getElementById('changePasswordBtn').addEventListener('click', () => {
-    document.getElementById('passwordModal').style.display = 'flex';
-  });
-  document.getElementById('closePasswordModal').addEventListener('click', () => {
-    document.getElementById('passwordModal').style.display = 'none';
-  });
-
-  // 6) приём данных из модалки и вызов API смены пароля
-  document.getElementById('submitPasswordChange').addEventListener('click', () => {
-    const oldPassword = document.getElementById('oldPassword').value.trim();
-    const newPassword = document.getElementById('newPassword').value.trim();
-    const role        = localStorage.getItem('role');
-    const id          = localStorage.getItem(`${role}Id`);
-    const errorBlock  = document.getElementById('passwordError');
-
-    if (!oldPassword || !newPassword) {
-      errorBlock.textContent = 'Заполните все поля';
-      return;
-    }
-
-    fetch('https://medapp-to7o.onrender.com/api/change-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role, id, oldPassword, newPassword })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.message.includes('Пароль должен')) {
-          errorBlock.textContent = data.message;
-        } else {
-          alert(data.message);
-          document.getElementById('passwordModal').style.display = 'none';
-        }
-      })
-      .catch(() => {
-        errorBlock.textContent = 'Ошибка при смене пароля';
-      });
-  });
-});
-loadStudentList();
-showStudentsView();
-
-</script>
-
-  <script src="curator-dashboard.js"></script>
-  
-  <div id="passwordModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="close" id="closePasswordModal">&times;</span>
-      <h3>Смена пароля</h3>
-      <input type="password" id="oldPassword" placeholder="Старый пароль" />
-      <input type="password" id="newPassword" placeholder="Новый пароль" />
-      <div id="passwordError" style="color:red; margin: 0.5rem 0;"></div>
-      <button id="submitPasswordChange">Изменить пароль</button>
+    <div class="form-group" style="position:relative;">
+      <label for="assignSearch">ФИО студента</label>
+      <input
+        type="text"
+        id="assignSearch"
+        placeholder="Начните вводить ФИО..."
+        autocomplete="off"
+      />
+      <ul id="assignSuggestions" class="suggestions-list" style="position:absolute; top:100%; left:0; right:0; z-index:1000;"></ul>
     </div>
+
+    <div id="assignError" style="color:red; margin:0.5rem 0;"></div>
+    <button id="assignConfirmBtn" class="btn-submit">Добавить</button>
   </div>
+</div>
+
+<script src="curator-dashboard.js"></script>
   
   <style>
     .modal {
@@ -292,27 +177,6 @@ showStudentsView();
     font-size: 1.5rem; cursor: pointer;
   }
   </style>
-  <!-- МОДАЛЬНОЕ ОКНО добавления студента -->
-<div id="assignModal" class="modal" style="display:none;">
-  <div class="modal-content" style="max-width:500px; width:90%;">
-    <span class="close" id="closeAssignModal">&times;</span>
-    <h3>Добавить студента в вашу группу</h3>
-
-    <div class="form-group" style="position:relative;">
-      <label for="assignSearch">ФИО студента</label>
-      <input
-        type="text"
-        id="assignSearch"
-        placeholder="Начните вводить ФИО..."
-        autocomplete="off"
-      />
-      <ul id="assignSuggestions" class="suggestions-list" style="position:absolute; top:100%; left:0; right:0; z-index:1000;"></ul>
-    </div>
-
-    <div id="assignError" style="color:red; margin:0.5rem 0;"></div>
-    <button id="assignConfirmBtn" class="btn-submit">Добавить</button>
-  </div>
-</div>
 
 </body>
 </html>
