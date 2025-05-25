@@ -140,7 +140,6 @@ assignForm.addEventListener('submit', e => {
       if (!res.ok) throw new Error(data.message || 'Ошибка');
       assignMsg.style.color = 'green';
       assignMsg.textContent = data.message;
-      // опционально: перезагрузить список студентов
       loadStudentList?.();
     })
     .catch(err => {
