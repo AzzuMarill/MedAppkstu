@@ -44,9 +44,7 @@
             <li><a href="#" id="changePasswordBtn">Сменить пароль</a></li>
             <!-- КНОПКИ ДЛЯ ПЕРЕКЛЮЧЕНИЯ ВИДА -->
             <li><a href="#" id="showStudents">Студенты</a></li>
-            <li><a href="#" id="showNotifications">
-              Уведомления <span id="notifCount" class="badge">0</span>
-            </a></li>
+            <li><a href="#" id="showNotifications">Уведомления</a></li>
             <li><a href="login.html">Выход</a></li>
           </ul>          
         </nav>
@@ -62,7 +60,7 @@
           </div>  
           <section id="notifications" style="display:none; margin-bottom:1.5rem;">
           <h2>Уведомления</h2>
-          <ul id="notificationList" style="list-style: none; padding-left:0;">
+            <ul id="notificationList" class="notifications-list">
             <li>Загрузка...</li>
           </ul>
         </section>        
@@ -222,6 +220,24 @@ document.addEventListener('DOMContentLoaded', () => {
       font-size: 24px;
       cursor: pointer;
     }
+    /* Стили для уведомлений */
+  .notifications-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .notifications-list li {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #ddd;
+  }
+  .notifications-list li:last-child {
+    border-bottom: none;
+  }
+  .notifications-list li.unread {
+    background-color: #f9f9f9;
+    font-weight: bold;
+  }
+
   </style>
   
 </body>
