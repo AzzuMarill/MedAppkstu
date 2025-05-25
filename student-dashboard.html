@@ -174,43 +174,60 @@
 
     // === ФЛЮОРОГРАФИЯ ===
     document.getElementById('showXrayBtn').addEventListener('click', (e) => {
-      e.preventDefault();
-      document.getElementById('welcomeBlock').style.display = 'none';
-      const content = document.getElementById('dynamicContent');
-      content.innerHTML = `
-        <h3>Снимок флюорографии</h3>
-        <div style="margin-bottom: 1rem;">
-          <input type="file" id="xrayUpload" accept="image/*" />
-          <button id="uploadBtn">Загрузить</button>
-        </div>
-        <div id="xrayPreview">Загрузка...</div>
-      `;
-      loadXray();
+  e.preventDefault();
+  document.getElementById('welcomeBlock').style.display = 'none';
+  const content = document.getElementById('dynamicContent');
 
-      document.getElementById('uploadBtn').addEventListener('click', () => {
-        const file = document.getElementById('xrayUpload').files[0];
-        if (!file) return alert("Выберите файл для загрузки");
+  // 1) Рисуем форму с полем для срока годности
+  content.innerHTML = `
+    <h3>Снимок флюорографии</h3>
+    <div style="margin-bottom: 1rem;">
+      <label style="display:block; margin-bottom:0.5rem;">
+        Срок годности:
+        <input type="date" id="expiryDate" />
+      </label>
+      <input type="file" id="xrayUpload" accept="image/*" />
+      <button id="uploadBtn">Загрузить</button>
+    </div>
+    <div id="xrayPreview">Загрузка...</div>
+  `;
 
-        const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
-        const formData = new FormData();
-        formData.append('image', file);
-        formData.append('studentId', studentId);
+  // 2) Сразу подгружаем уже сохранённый снимок (и дату, если нужно)
+  loadXray();
 
-        fetch('https://medapp-to7o.onrender.com/api/xray-upload', {
-          method: 'POST',
-          body: formData
-        })
-          .then(res => res.json())
-          .then(data => {
-            alert(data.message || 'Загружено');
-            loadXray();
-          })
-          .catch(err => {
-            console.error(err);
-            alert('Ошибка при загрузке снимка');
-          });
-      });
+  // 3) Перехватываем клик по кнопке и отправляем вместе с expiryDate
+  document.getElementById('uploadBtn').addEventListener('click', () => {
+    const file   = document.getElementById('xrayUpload').files[0];
+    const expiry = document.getElementById('expiryDate').value;
+
+    if (!file) {
+      return alert("Выберите файл для загрузки");
+    }
+    if (!expiry) {
+      return alert("Укажите срок годности");
+    }
+
+    const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');
+    const formData  = new FormData();
+    formData.append('image',      file);
+    formData.append('studentId',  studentId);
+    formData.append('expiryDate', expiry);
+
+    fetch('https://medapp-to7o.onrender.com/api/xray-upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || 'Загружено');
+      loadXray();  // обновляем превью
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Ошибка при загрузке снимка');
     });
+  });
+});
 
     function loadXray() {
       const studentId = localStorage.getItem('studentId') || localStorage.getItem('userId');

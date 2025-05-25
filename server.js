@@ -130,7 +130,8 @@ db.run(`CREATE TABLE IF NOT EXISTS notifications (
 // Таблица для снимков флюорографии
 db.run(`CREATE TABLE IF NOT EXISTS xray_images (
   student_id INTEGER PRIMARY KEY,
-  image_path TEXT
+  image_path TEXT, 
+  expiry_date  TEXT
 )`);
 
 db.run(`CREATE TABLE IF NOT EXISTS curators (
@@ -167,66 +168,81 @@ app.post('/api/students', async (req, res) => {
   }
 });
 
-// Флюорография — сохранить
+// 1) Загрузка флюорографии + срок годности
 app.post('/api/xray-upload', upload.single('image'), (req, res) => {
-  const { studentId } = req.body;
-  if (!studentId || !req.file) return res.status(400).json({ message: 'Неверные данные или файл не передан' });
+  const { studentId, expiryDate } = req.body;
+  if (!studentId || !req.file || !expiryDate) {
+    return res.status(400).json({ message: 'Нужно передать studentId, файл и expiryDate' });
+  }
 
   const filePath = `/uploads/${req.file.filename}`;
 
-  // Проверяем, была ли уже загружена флюорография
-  db.get("SELECT * FROM students WHERE id = ?", [studentId], (err, student) => {
-    if (err || !student) return res.status(404).json({ message: 'Студент не найден' });
-
-    // Обновим или создадим отдельную таблицу, если еще нет
-    db.run(`CREATE TABLE IF NOT EXISTS xray_images (
-      student_id INTEGER PRIMARY KEY,
-      image_path TEXT
-    )`, () => {
-      // Сохраняем путь
-      db.run(
-        `INSERT INTO xray_images (student_id, image_path)
-         VALUES (?, ?)
-         ON CONFLICT(student_id) DO UPDATE SET image_path = excluded.image_path`,
-        [studentId, filePath],
-        (err) => {
-          if (err) return res.status(500).json({ message: 'Ошибка при сохранении пути снимка' });
-          res.json({ message: 'Снимок сохранен', imageUrl: filePath });
-        }
-      );
-    });
-  });
+  // Вставляем или обновляем запись вместе с expiry_date
+  db.run(
+    `INSERT INTO xray_images (student_id, image_path, expiry_date)
+     VALUES (?, ?, ?)
+     ON CONFLICT(student_id) DO UPDATE
+       SET image_path  = excluded.image_path,
+           expiry_date = excluded.expiry_date`,
+    [studentId, filePath, expiryDate],
+    function(err) {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Ошибка при сохранении' });
+      }
+      res.json({
+        message: 'Снимок и срок годности сохранены',
+        imageUrl: filePath,
+        expiryDate
+      });
+    }
+  );
 });
 
-// Флюорография — получить
+// 2) Получение пути и срока годности
 app.get('/api/xray/:studentId', (req, res) => {
   const studentId = req.params.studentId;
-  db.get("SELECT image_path FROM xray_images WHERE student_id = ?", [studentId], (err, row) => {
-    if (err) return res.status(500).json({ message: 'Ошибка при получении снимка' });
-    if (!row) return res.status(404).json({ message: 'Снимок не найден' });
-    res.json({ imageUrl: row.image_path });
-  });
+  db.get(
+    `SELECT image_path AS imageUrl,
+            expiry_date AS expiryDate
+       FROM xray_images
+      WHERE student_id = ?`,
+    [studentId],
+    (err, row) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Ошибка БД' });
+      }
+      if (!row) return res.status(404).json({ message: 'Снимок не найден' });
+      res.json(row);
+    }
+  );
 });
 
-// Флюорография — удалить
+// 3) Удаление флюорографии
 app.delete('/api/xray/:studentId', (req, res) => {
   const studentId = req.params.studentId;
-  db.get("SELECT image_path FROM xray_images WHERE student_id = ?", [studentId], (err, row) => {
-    if (err || !row) return res.status(404).json({ message: 'Снимок не найден' });
+  db.get(
+    'SELECT image_path FROM xray_images WHERE student_id = ?',
+    [studentId],
+    (err, row) => {
+      if (err || !row) return res.status(404).json({ message: 'Снимок не найден' });
 
-    const fs = require('fs');
-    const imagePath = path.join(__dirname, row.image_path);
-    fs.unlink(imagePath, (unlinkErr) => {
-      if (unlinkErr) console.error('Ошибка при удалении файла:', unlinkErr);
-
-      db.run("DELETE FROM xray_images WHERE student_id = ?", [studentId], (dbErr) => {
-        if (dbErr) return res.status(500).json({ message: 'Ошибка при удалении записи' });
-        res.json({ message: 'Снимок удалён' });
+      const fullPath = path.join(__dirname, row.image_path);
+      fs.unlink(fullPath, unlinkErr => {
+        if (unlinkErr) console.error('fs.unlink:', unlinkErr);
+        db.run(
+          'DELETE FROM xray_images WHERE student_id = ?',
+          [studentId],
+          dbErr => {
+            if (dbErr) return res.status(500).json({ message: 'Ошибка удаления записи' });
+            res.json({ message: 'Снимок удалён' });
+          }
+        );
       });
-    });
-  });
+    }
+  );
 });
-
 // Получить одну новость
 app.get('/api/news/:id', (req, res) => {
   const id = req.params.id;
@@ -679,9 +695,13 @@ app.get('/api/curator/students/:groupName', (req, res) => {
   const group = req.params.groupName;
 
   const sql = `
-    SELECT s.id, s.fio, xi.image_path
+    SELECT 
+    s.id, 
+    s.fio, 
+    xi.image_path AS imagePath,
+    xi.expiry_date AS expiryDate
     FROM students s
-    JOIN medical_data md ON s.id = md.student_id
+    LEFT JOIN medical_data md ON s.id = md.student_id
     LEFT JOIN xray_images xi ON s.id = xi.student_id
     WHERE md.occupation = ?
   `;

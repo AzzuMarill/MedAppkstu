@@ -88,6 +88,22 @@ document.addEventListener('DOMContentLoaded', () => {
             noImg.textContent = 'Снимок флюорографии не загружен.';
             card.appendChild(noImg);
           }
+            // срок годности
+            if (student.expiryDate) {
+              const p = document.createElement('p');
+              p.textContent = `Срок годности: ${new Date(student.expiryDate).toLocaleDateString()}`;
+
+              const now = new Date();
+              const exp = new Date(student.expiryDate);
+              if (exp < now) {
+                p.style.color = 'red';
+                p.textContent += ' (просрочен)';
+              } else if ((exp - now) < 7*24*3600*1000) {
+                p.style.color = 'orange';
+                p.textContent += ' (заканчивается)';
+              }
+              card.appendChild(p);
+            }
             // === Кнопка "Удалить" ===
           const deleteBtn = document.createElement('button');
           deleteBtn.textContent = 'Удалить';
