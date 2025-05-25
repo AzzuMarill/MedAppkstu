@@ -88,6 +88,30 @@ document.addEventListener('DOMContentLoaded', () => {
             noImg.textContent = 'Снимок флюорографии не загружен.';
             card.appendChild(noImg);
           }
+            // === Кнопка "Удалить" ===
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = 'Удалить';
+          deleteBtn.className = 'btn-delete';
+          deleteBtn.style.marginLeft = '1rem';
+          deleteBtn.addEventListener('click', () => {
+            if (!confirm(`Точно удалить «${student.fio}» из вашей группы?`)) return;
+            const curatorId = localStorage.getItem('userId');
+            fetch('https://medapp-to7o.onrender.com/api/unassign-student', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ curatorId, studentId: student.id })
+            })
+            .then(res => res.json())
+            .then(resp => {
+              if (resp.message) alert(resp.message);
+              loadStudentList();
+            })
+            .catch(err => {
+              console.error('Ошибка удаления студента:', err);
+              alert('Не удалось удалить студента');
+            });
+          });
+          card.appendChild(deleteBtn);
 
           studentListEl.appendChild(card);
         });

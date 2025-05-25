@@ -36,26 +36,29 @@
         
     </header>
       
+<main class="main-content">
+  <section class="center-content">
+    <!-- Обёртка заголовка и кнопки -->
+    <div class="title-bar">
+      <h2 id="studentsTitle">Студенты вашей группы</h2>
+      <button id="openAssignModal" class="btn-submit">Добавить студента</button>
+    </div>
+    <span id="curatorGroupInfo" class="group-info">Ваша группа: СИБ-23-2</span>
 
-    <main class="main-content">
-      <section class="center-content">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 id="studentsTitle" style="margin: 0;">Студенты вашей группы</h2>
-            <span id="curatorGroupInfo" style="font-size: 1rem; color: #333;"></span>
-          </div>  
-          <section id="notifications" style="display:none; margin-bottom:1.5rem;">
-          <h2>Уведомления</h2>
-            <ul id="notificationList" class="notifications-list">
-            <li>Загрузка...</li>
-          </ul>
-        </section>     
-        <button id="openAssignModal" class="btn-submit" style="margin-left:1rem;">
-          Добавить студента
-        </button>
-        <div id="studentList"></div>
-        <div id="dynamicContent"></div>
-      </section>
-    </main>
+    <!-- Блок уведомлений -->
+    <section id="notifications" style="display: none; margin-bottom: 1.5rem;">
+      <h2>Уведомления</h2>
+      <ul id="notificationList" class="notifications-list">
+        <li>Загрузка...</li>
+      </ul>
+    </section>
+
+    <!-- Список студентов -->
+    <div id="studentList"></div>
+    <div id="dynamicContent"></div>
+  </section>
+</main>
+
 
     <footer class="footer">
       © 2025 Students medical app
@@ -173,6 +176,50 @@
     top: 0.5rem; right: 1rem;
     font-size: 1.5rem; cursor: pointer;
   }
+.title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.title-bar h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.group-info {
+  display: block;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.btn-submit {
+  background-color: #1abc9c;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background-color: #16a085;
+}
+.btn-delete {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background-color: #c0392b;
+}
+
   </style>
 
 </body>

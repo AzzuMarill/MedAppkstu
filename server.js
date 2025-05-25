@@ -914,7 +914,7 @@ app.get('/api/search-students', (req, res) => {
   db.all(
     `SELECT id, fio 
      FROM students 
-     WHERE fio LIKE ? 
+     WHERE fio LIKE ? COLLATE NOCASE
        AND id NOT IN (SELECT student_id FROM medical_data)
      LIMIT 10`,
     [`%${q}%`],
@@ -924,7 +924,36 @@ app.get('/api/search-students', (req, res) => {
     }
   );
 });
+// Удалить студента из группы куратора
+app.post('/api/unassign-student', express.json(), (req, res) => {
+  const { curatorId, studentId } = req.body;
+  if (!curatorId || !studentId) {
+    return res.status(400).json({ message: 'Не указан curatorId или studentId' });
+  }
+  // Получаем группу куратора
+  db.get(
+    'SELECT group_name FROM curators WHERE id = ?',
+    [curatorId],
+    (err, row) => {
+      if (err) return res.status(500).json({ message: 'Ошибка сервера' });
+      if (!row) return res.status(404).json({ message: 'Куратор не найден' });
 
+      const group = row.group_name;
+      // Обнуляем occupation только для этого студента и этой группы
+      db.run(
+        'UPDATE medical_data SET occupation = NULL WHERE student_id = ? AND occupation = ?',
+        [studentId, group],
+        function(err2) {
+          if (err2) return res.status(500).json({ message: 'Ошибка при удалении студента' });
+          if (this.changes === 0) {
+            return res.status(400).json({ message: 'Студент не состоит в вашей группе' });
+          }
+          res.json({ message: 'Студент удалён из группы' });
+        }
+      );
+    }
+  );
+});
 
 // Запуск сервера
 const PORT = 3000;
