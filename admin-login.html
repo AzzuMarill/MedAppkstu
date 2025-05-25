@@ -4,6 +4,24 @@
   <meta charset="UTF-8" />
   <title>Вход администратора — Students medical app</title>
   <link rel="stylesheet" href="univer-style.css" />
+  <style>
+  .password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .password-wrapper input {
+    flex: 1;
+    padding-right: 2.5rem; /* место под глазик */
+  }
+  .toggle-password {
+    position: absolute;
+    right: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+    font-size: 1.2rem;
+  }
+</style>
 </head>
 <body>
   <div class="page-wrapper">
@@ -38,9 +56,12 @@
             <input type="text" id="adminLogin" name="adminLogin" placeholder="Логин" required>
           </div>
 
-          <div class="form-group">
+          <div class="form-group password-group">
             <label for="adminPassword">Пароль</label>
-            <input type="password" id="adminPassword" name="adminPassword" placeholder="Пароль" required>
+            <div class="password-wrapper">
+              <input type="password" id="adminPassword" name="adminPassword" placeholder="Пароль" required>
+              <span id="toggleAdminPassword" class="toggle-password" aria-label="Показать пароль">👁</span>
+            </div>
           </div>
 
           <button type="submit" class="btn-submit">Войти</button>

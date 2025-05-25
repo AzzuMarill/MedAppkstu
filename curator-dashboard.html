@@ -55,7 +55,7 @@
     <main class="main-content">
       <section class="center-content">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="margin: 0;">Студенты вашей группы</h2>
+            <h2 id="studentsTitle" style="margin: 0;">Студенты вашей группы</h2>
             <span id="curatorGroupInfo" style="font-size: 1rem; color: #333;"></span>
           </div>  
           <section id="notifications" style="display:none; margin-bottom:1.5rem;">
@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const studentListEl   = document.getElementById('studentList');
   const notificationsEl = document.getElementById('notifications');
   const groupElement    = document.getElementById('curatorGroupInfo');
+  const studentsTitleEl = document.getElementById('studentsTitle');
 
   // 1) загрузка и рендер уведомлений (без счётчика)
   function loadNotifications() {
@@ -110,16 +111,19 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // 2) функции переключения между списком студентов и уведомлениями
+    // 2) функции переключения между списком студентов и уведомлениями
   function showStudentsView() {
-    notificationsEl.style.display = 'none';
-    studentListEl.style.display = 'block';
+    studentsTitleEl.style.display   = '';        // показываем заголовок
+    notificationsEl.style.display   = 'none';
+    studentListEl.style.display     = 'block';
   }
   function showNotificationsView() {
-    studentListEl.style.display = 'none';
-    notificationsEl.style.display = 'block';
+    studentsTitleEl.style.display   = 'none';    // скрываем заголовок
+    studentListEl.style.display     = 'none';
+    notificationsEl.style.display   = 'block';
     loadNotifications();
   }
+
 
   // 3) привязка кнопок в шапке
   document.getElementById('showStudents')

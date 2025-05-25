@@ -40,6 +40,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('verifyCodeBtn')?.addEventListener('click', submitTelegramCode);
   document.getElementById('cancelCodeBtn')?.addEventListener('click', closeModal);
+  const adminPasswordInput = document.getElementById('adminPassword');
+  const toggleAdminPass    = document.getElementById('toggleAdminPassword');
+  if (adminPasswordInput && toggleAdminPass) {
+    toggleAdminPass.addEventListener('click', () => {
+      const isHidden = adminPasswordInput.type === 'password';
+      adminPasswordInput.type = isHidden ? 'text' : 'password';
+      toggleAdminPass.textContent = isHidden ? '🙈' : '👁';
+    });
+  }
 });
 
 function showCodeModal() {

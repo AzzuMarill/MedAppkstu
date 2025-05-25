@@ -489,7 +489,7 @@ app.post('/api/doctor-visits', upload.single('exemptionFile'), (req, res) => {
                 [mdRow.group_name],
                 (err, curRows) => {
                   curRows.forEach(cur => {
-                    const msg = `Студент ${studentName} посетил врача ${visitDate} по причине "${complaints}"`;
+                    const msg = `Студент ${studentName} посетил врача по причине "${complaints}"`;
                     db.run(
                       'INSERT INTO notifications (curator_id, student_id, message) VALUES (?, ?, ?)',
                       [cur.id, studentId, msg]
