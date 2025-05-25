@@ -29,3 +29,122 @@ INSERT INTO students (fio, login, password, email) VALUES
 ('Шілмен Байкен Рысбекұлы',          'shilmen.bayken',       'Qwerty1!', '');
 
 COMMIT;
+
+BEGIN TRANSACTION;
+
+UPDATE students
+SET password = '$2b$10$V4k7BGn2enkgVQQ5IoPbK.mPFY6YSKXgsGPsDqqM8tbOcXO2t6Fl.'
+WHERE login = 'savronov.sandzhar';
+
+UPDATE students
+SET password = '$2b$10$NTECNG88Lk0wggiTvDBDnOqhfckanCK/kOXPLlKjdXkK/0rfk14Ja'
+WHERE login = 'kurbanali.madiyar';
+
+UPDATE students
+SET password = '$2b$10$vGLm0OJaz5rNw5UkdQ6X3utgU7dp05NIkNwSYHvRtkU1VjbtOc1aq'
+WHERE login = 'ergenov.azimbek';
+
+UPDATE students
+SET password = '$2b$10$.XPo3A9cmmrTR/meC4lXGeVMJqmoT520MzLgOs09pWWUzoPl1bb1W'
+WHERE login = 'zholdasilov.kuanysh';
+
+UPDATE students
+SET password = '$2b$10$RcHX6QlCy40M22f6MVQGv.ofBdjhbYUClqj62F238xwUX7vcY8ZC.'
+WHERE login = 'zhaksigeldi.shahniyaz';
+
+UPDATE students
+SET password = '$2b$10$jG1qJnwNlpxUN6BvLdbjNu7wo7D5hpXKCJ9QtSx1t4KS49den2vaO'
+WHERE login = 'arimbek.nursultan';
+
+UPDATE students
+SET password = '$2b$10$ptSHVDFPJ3Q2zvvC4ZLrk.Qsid.NCRyhIUI1n3/avKLnQSiLNOvYm'
+WHERE login = 'erzhigit.aydin';
+
+UPDATE students
+SET password = '$2b$10$jc0m0CT.YM.GhiKTDRk4QufR55je..Z.tJm0KDe/jDfG9kgtARUOm'
+WHERE login = 'kakenov.nursultan';
+
+UPDATE students
+SET password = '$2b$10$LSHx4lSRGoA34yUbjlbQ2.G5ZkHUG4OzNqm48cHE.OMbm9ppV5P56'
+WHERE login = 'kaldybek.shygyskhan';
+
+UPDATE students
+SET password = '$2b$10$xNuiQOQZHj8Mwbf5/athzOBujE.ykC5wz.EcuhrsAZ1.6bhjWV36W'
+WHERE login = 'kutzhanov.alim';
+
+UPDATE students
+SET password = '$2b$10$rbvcTrLZEN9AktnA/ciyhuy88oEor3KzEimGPW40Px3b9jHiT2Pjy'
+WHERE login = 'kapar.raushan';
+
+UPDATE students
+SET password = '$2b$10$8ZsFm37ldJwsQ1MiOoNWp.a52n8YqlhS5Kk9dY1J/GPGei86gtx5i'
+WHERE login = 'kiyash.abu';
+
+UPDATE students
+SET password = '$2b$10$staJQ3DpmLTrHgvwd6BVneZhV5NlY3uVonmyGh1CL9m2wIARdS0vK'
+WHERE login = 'erzhanov.birzhan';
+
+UPDATE students
+SET password = '$2b$10$t3qG0/hUkGZKkHKe26bcquSTOYx0lJHwkARutNYIP.VC6hEOLhIde'
+WHERE login = 'nazarbek.zhuldyz';
+
+UPDATE students
+SET password = '$2b$10$p1Kt4bY4.wDLg.nL0zaS.Oxc.wuOnO8.iBvew0mR0XP/Z8utKFAnS'
+WHERE login = 'iembergen.aibek';
+
+UPDATE students
+SET password = '$2b$10$bCCwVz6sR5Muu0ybF8oC..3Bzcj9N3BTcUWIbRDIL1YAOUxp4X9Uy'
+WHERE login = 'kandibekova.ainur';
+
+UPDATE students
+SET password = '$2b$10$7fHvBf/SxT2Bz4VsNrgoIeRlNfYCroRx..cMmMpDmtT/gVB8ptsmO'
+WHERE login = 'zhambyrov.ersultan';
+
+UPDATE students
+SET password = '$2b$10$PJ3dSYH4A88/UwWZLmNWjecY/.v/ncKLn1rp6ABvlTW7UPnE9z436'
+WHERE login = 'sadulla.isatay';
+
+UPDATE students
+SET password = '$2b$10$fjxUQNLuayZcX.4f0yLqOOyyNgl6TpV8/DSzV6bJpSL3JHkasQm1K'
+WHERE login = 'kuntugan.dias';
+
+UPDATE students
+SET password = '$2b$10$Sr7co1vNCofRvawJ43QS8OPCW8K0LZMLgMe6DOPUhCW.1/dndJLD.'
+WHERE login = 'zhumagulova.lazzat';
+
+UPDATE students
+SET password = '$2b$10$R47tML3BCfyuVM1J4CgdfuXHeDzNeBk4NG.LkrK55q3N08NuoTev2'
+WHERE login = 'ergalieva.merey';
+
+UPDATE students
+SET password = '$2b$10$nPe/PC501V3vUhIKPGvnNeq89q8ZYf3fiSMkwfjStV7g3bvJcK2Qq'
+WHERE login = 'shilmen.bayken';
+
+COMMIT;
+
+BEGIN TRANSACTION;
+
+UPDATE students SET email = 'savronov.sandzhar@mail.ru'    WHERE login = 'savronov.sandzhar';
+UPDATE students SET email = 'kurbanali.madiyar@mail.ru'    WHERE login = 'kurbanali.madiyar';
+UPDATE students SET email = 'ergenov.azimbek@mail.ru'      WHERE login = 'ergenov.azimbek';
+UPDATE students SET email = 'zholdasilov.kuanysh@mail.ru' WHERE login = 'zholdasilov.kuanysh';
+UPDATE students SET email = 'zhaksigeldi.shahniyaz@mail.ru'WHERE login = 'zhaksigeldi.shahniyaz';
+UPDATE students SET email = 'arimbek.nursultan@mail.ru'    WHERE login = 'arimbek.nursultan';
+UPDATE students SET email = 'erzhigit.aydin@mail.ru'       WHERE login = 'erzhigit.aydin';
+UPDATE students SET email = 'kakenov.nursultan@mail.ru'    WHERE login = 'kakenov.nursultan';
+UPDATE students SET email = 'kaldybek.shygyskhan@mail.ru'  WHERE login = 'kaldybek.shygyskhan';
+UPDATE students SET email = 'kutzhanov.alim@mail.ru'       WHERE login = 'kutzhanov.alim';
+UPDATE students SET email = 'kapar.raushan@mail.ru'        WHERE login = 'kapar.raushan';
+UPDATE students SET email = 'kiyash.abu@mail.ru'           WHERE login = 'kiyash.abu';
+UPDATE students SET email = 'erzhanov.birzhan@mail.ru'     WHERE login = 'erzhanov.birzhan';
+UPDATE students SET email = 'nazarbek.zhuldyz@mail.ru'     WHERE login = 'nazarbek.zhuldyz';
+UPDATE students SET email = 'iembergen.aibek@mail.ru'      WHERE login = 'iembergen.aibek';
+UPDATE students SET email = 'kandibekova.ainur@mail.ru'    WHERE login = 'kandibekova.ainur';
+UPDATE students SET email = 'zhambyrov.ersultan@mail.ru'   WHERE login = 'zhambyrov.ersultan';
+UPDATE students SET email = 'sadulla.isatay@mail.ru'       WHERE login = 'sadulla.isatay';
+UPDATE students SET email = 'kuntugan.dias@mail.ru'        WHERE login = 'kuntugan.dias';
+UPDATE students SET email = 'zhumagulova.lazzat@mail.ru'   WHERE login = 'zhumagulova.lazzat';
+UPDATE students SET email = 'ergalieva.merey@mail.ru'      WHERE login = 'ergalieva.merey';
+UPDATE students SET email = 'shilmen.bayken@mail.ru'       WHERE login = 'shilmen.bayken';
+
+COMMIT;
