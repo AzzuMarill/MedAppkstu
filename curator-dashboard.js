@@ -1,6 +1,19 @@
 // curator-dashboard.js
 
 document.addEventListener('DOMContentLoaded', () => {
+    
+    const role = localStorage.getItem('role');
+    const id = localStorage.getItem('userId');
+    const allowedRole = 'curator';
+    const messageBlock = document.getElementById('accessDeniedMessage');
+  
+    if (!id || role !== allowedRole) {
+      messageBlock.style.display = 'block';
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 3000);
+    }
+  
   // === DOM-элементы ===
   const studentListEl       = document.getElementById('studentList');
   const notificationsEl     = document.getElementById('notifications');
@@ -178,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedStudentId         = null;
     if (!q) return;
     searchDebounce = setTimeout(() => {
-      fetch(`/api/search-students?q=${encodeURIComponent(q)}`)
+      fetch(`https://medapp-to7o.onrender.com/api/search-students?q=${encodeURIComponent(q)}`)
         .then(r => r.json())
         .then(list => {
           suggestionsList.innerHTML = '';

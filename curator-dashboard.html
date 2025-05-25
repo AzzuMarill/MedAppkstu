@@ -4,21 +4,6 @@
   <meta charset="UTF-8" />
   <title>Кабинет куратора</title>
   <link rel="stylesheet" href="univer-style.css" />
-  
-  <script>
-    const role = localStorage.getItem('role');
-    const id = localStorage.getItem('userId');
-    const allowedRole = 'curator';
-    const messageBlock = document.getElementById('accessDeniedMessage');
-  
-    if (!id || role !== allowedRole) {
-      messageBlock.style.display = 'block';
-      setTimeout(() => {
-        window.location.href = 'login.html';
-      }, 3000);
-    }
-  </script>
-  
 </head>
 <body>
     <div id="accessDeniedMessage" style="display:none; padding: 10px; background: #ffcccc; color: #a00; font-weight: bold; text-align: center;">
@@ -56,9 +41,6 @@
       <section class="center-content">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2 id="studentsTitle" style="margin: 0;">Студенты вашей группы</h2>
-            <button id="openAssignModal" class="btn-submit" style="margin-left:1rem;">
-              Добавить студента
-            </button>
             <span id="curatorGroupInfo" style="font-size: 1rem; color: #333;"></span>
           </div>  
           <section id="notifications" style="display:none; margin-bottom:1.5rem;">
@@ -67,6 +49,9 @@
             <li>Загрузка...</li>
           </ul>
         </section>     
+        <button id="openAssignModal" class="btn-submit" style="margin-left:1rem;">
+          Добавить студента
+        </button>
         <div id="studentList"></div>
         <div id="dynamicContent"></div>
       </section>
