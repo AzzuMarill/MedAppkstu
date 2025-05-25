@@ -82,7 +82,6 @@ function loadNotifications() {
     .then(res => res.json())
     .then(data => {
       const ul = document.getElementById('notificationList');
-      const count = document.getElementById('notifCount');
       ul.innerHTML = '';
       const unread = data.filter(n => n.is_read === 0).length;
       count.textContent = unread;
@@ -93,7 +92,8 @@ function loadNotifications() {
       data.forEach(n => {
         const li = document.createElement('li');
         li.textContent = `${new Date(n.created_at).toLocaleString()}: ${n.message}`;
-        if (n.is_read === 0) li.style.fontWeight = 'bold';
+        if (n.is_read === 0) li.classList.add('unread');
+
         li.onclick = () => {
           fetch(`/api/notifications/${n.id}/read`, { method: 'POST' })
             .then(() => li.style.fontWeight = 'normal');
