@@ -54,7 +54,13 @@
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2 style="margin: 0;">Студенты вашей группы</h2>
             <span id="curatorGroupInfo" style="font-size: 1rem; color: #333;"></span>
-          </div>          
+          </div>  
+        <section id="notifications" style="margin-bottom:1.5rem;">
+          <h2>Уведомления</h2>
+          <ul id="notificationList" style="list-style: none; padding-left:0;">
+            <li>Загрузка...</li>
+          </ul>
+        </section>        
         <div id="studentList"></div>
         <div id="dynamicContent"></div>
       </section>
@@ -67,6 +73,33 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // --- Загрузка уведомлений ---
+      const curatorId = localStorage.getItem('userId');
+      fetch(`https://medapp-to7o.onrender.com/api/notifications/${curatorId}`)
+        .then(res => res.json())
+        .then(data => {
+          const ul = document.getElementById('notificationList');
+          ul.innerHTML = '';
+          if (!data || data.length === 0) {
+            ul.innerHTML = '<li>Нет новых уведомлений.</li>';
+            return;
+          }
+          data.forEach(n => {
+            const li = document.createElement('li');
+            li.textContent = `${new Date(n.created_at).toLocaleString()}: ${n.message}`;
+            if (n.is_read === 0) li.style.fontWeight = 'bold';
+            // при клике пометить прочитанным
+            li.onclick = () => {
+              fetch(`https://medapp-to7o.onrender.com/api/notifications/${n.id}/read`, { method: 'POST' })
+                .then(() => { li.style.fontWeight = 'normal'; });
+            };
+            ul.appendChild(li);
+          });
+        })
+        .catch(err => {
+          console.error('Ошибка загрузки уведомлений:', err);
+          document.getElementById('notificationList').innerHTML = '<li>Ошибка загрузки.</li>';
+        });
       const group = localStorage.getItem('curatorGroup');
       const groupElement = document.getElementById('curatorGroupInfo');
       if (group && groupElement) groupElement.textContent = `Ваша группа: ${group}`;

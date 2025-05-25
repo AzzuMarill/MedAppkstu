@@ -117,6 +117,16 @@ db.run(`CREATE TABLE IF NOT EXISTS news (
   imageUrl TEXT
 )`);
 
+// 6. Уведомления кураторов
+db.run(`CREATE TABLE IF NOT EXISTS notifications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  curator_id INTEGER,
+  student_id INTEGER,
+  message TEXT NOT NULL,
+  is_read INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+)`);
+
 // Таблица для снимков флюорографии
 db.run(`CREATE TABLE IF NOT EXISTS xray_images (
   student_id INTEGER PRIMARY KEY,
@@ -442,17 +452,59 @@ app.post('/api/medical-data', (req, res) => {
 // Сохранить визит к врачу
 app.post('/api/doctor-visits', upload.single('exemptionFile'), (req, res) => {
   const { doctorId, studentId, visitDate, complaints, isExempted } = req.body;
-  if (!doctorId || !studentId || !visitDate || !complaints) return res.status(400).json({ message: 'Заполните все поля' });
+  if (!doctorId || !studentId || !visitDate || !complaints) 
+    return res.status(400).json({ message: 'Заполните все поля' });
 
-  const exemptionFilePath = (isExempted == '1' && req.file) ? `/uploads/${req.file.filename}` : null;
-  if (isExempted == '1' && !req.file) return res.status(400).json({ message: 'Файл освобождения обязателен' });
+  const exemptionFilePath = (isExempted == '1' && req.file)
+    ? `/uploads/${req.file.filename}`
+    : null;
+  if (isExempted == '1' && !req.file)
+    return res.status(400).json({ message: 'Файл освобождения обязателен' });
 
-  db.run(`INSERT INTO doctor_visits (doctor_id, student_id, visit_date, complaints, is_exempted, exemption_file) VALUES (?, ?, ?, ?, ?, ?)`,
+  // Сохраняем визит
+  db.run(
+    `INSERT INTO doctor_visits
+      (doctor_id, student_id, visit_date, complaints, is_exempted, exemption_file)
+     VALUES (?, ?, ?, ?, ?, ?)`,
     [doctorId, studentId, visitDate, complaints, isExempted == '1' ? 1 : 0, exemptionFilePath],
     function(err) {
-      if (err) return res.status(500).json({ message: 'Ошибка при сохранении визита' });
-      res.status(201).json({ message: 'Визит сохранён', visitId: this.lastID });
-    });
+      if (err) 
+        return res.status(500).json({ message: 'Ошибка при сохранении визита' });
+
+      const visitId = this.lastID;
+
+      // Получаем ФИО студента
+      db.get('SELECT fio FROM students WHERE id = ?', [studentId], (err, studRow) => {
+        const studentName = studRow ? studRow.fio : `#${studentId}`;
+
+        // Ищем группу в медицинской анкете
+        db.get(
+          'SELECT occupation AS group_name FROM medical_data WHERE student_id = ?',
+          [studentId],
+          (err, mdRow) => {
+            if (mdRow && mdRow.group_name) {
+              // Выбираем всех кураторов этой группы
+              db.all(
+                'SELECT id FROM curators WHERE group_name = ?',
+                [mdRow.group_name],
+                (err, curRows) => {
+                  curRows.forEach(cur => {
+                    const msg = `Студент ${studentName} посетил врача ${visitDate} по причине "${complaints}"`;
+                    db.run(
+                      'INSERT INTO notifications (curator_id, student_id, message) VALUES (?, ?, ?)',
+                      [cur.id, studentId, msg]
+                    );
+                  });
+                }
+              );
+            }
+          }
+        );
+      });
+
+      res.status(201).json({ message: 'Визит сохранён', visitId });
+    }
+  );
 });
 
 app.get('/api/doctor-visits/doctor/:doctorId', (req, res) => {
@@ -476,6 +528,31 @@ app.get('/api/doctor-visits/student/:studentId', (req, res) => {
     if (err) return res.status(500).json({ message: 'Ошибка при получении визитов' });
     res.json(rows);
   });
+});
+
+// Получить уведомления для куратора
+app.get('/api/notifications/:curatorId', (req, res) => {
+  const curatorId = req.params.curatorId;
+  db.all(
+    'SELECT * FROM notifications WHERE curator_id = ? ORDER BY created_at DESC',
+    [curatorId],
+    (err, rows) => {
+      if (err) return res.status(500).json({ message: 'Ошибка при получении уведомлений' });
+      res.json(rows);
+    }
+  );
+});
+
+// Отметить уведомление как прочитанное
+app.post('/api/notifications/:id/read', (req, res) => {
+  db.run(
+    'UPDATE notifications SET is_read = 1 WHERE id = ?',
+    [req.params.id],
+    err => {
+      if (err) return res.status(500).json({ message: 'Ошибка при обновлении уведомления' });
+      res.sendStatus(200);
+    }
+  );
 });
 
 // Новости
